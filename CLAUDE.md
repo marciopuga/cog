@@ -46,11 +46,10 @@ Persistent memory lives in `memory/`. Three tiers:
 
 ### L0 Headers (Progressive Context Loading)
 
-Every memory file has a one-line L0 summary near the top — a quick answer to "what would I find if I read this file?" (max 80 chars).
+Every memory file has a one-line L0 summary as **line 1** — a quick answer to "what would I find if I read this file?" (max 80 chars).
 
 **Format:**
-- Plain markdown files: `<!-- L0: summary here -->` on the line after `# Title`
-- YAML frontmatter files: `l0: "summary here"` inside the frontmatter
+- `<!-- L0: summary here -->` — always the first line of the file, before title or frontmatter
 
 **Maintenance:** When creating or restructuring a memory file, always add/update its L0. Pipeline steps (`/housekeeping`, `/reflect`) should preserve existing L0 headers and add them to new files.
 
