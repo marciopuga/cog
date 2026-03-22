@@ -10,7 +10,7 @@ Cross-domain strategic synthesis — personal, work, projects, health, family. T
 
 ## Memory Files
 
-Read broadly:
+Read broadly — this is a scan, not a focused lookup:
 
 1. Read `memory/domains.yml` to discover all active domains
 2. For each domain, read `hot-memory.md` and `action-items.md` (if they exist)
@@ -21,6 +21,7 @@ Read broadly:
    - `memory/personal/health.md` (health trajectory)
    - `memory/cog-meta/briefing-bridge.md` (housekeeping findings)
    - Recent observations across all domains (last 7 days)
+   - Thread current-state sections — what narratives are actively unfolding?
 
 ## Process
 
@@ -30,10 +31,13 @@ Look for topics, people, or themes appearing in 2+ domains simultaneously. These
 
 ### 2. Velocity & Stall Detection
 
-Scan action-items across all domains:
-- **Accelerating** — multiple updates in the last week
-- **Stalling** — no movement in 2+ weeks despite not being deferred
-- **Dormant** — domain-level silence (0 observations in 4+ weeks)
+Scan action-items across all domains. Classify each active item:
+- **Accelerating** — multiple updates in the last week, clear momentum. Signal: ride the wave, don't interrupt.
+- **Cruising** — steady progress, on track. Signal: nothing to flag.
+- **Stalling** — no movement in 2+ weeks despite not being deferred. Signal: ask why. Blocked? Lost priority?
+- **Dormant** — domain-level silence (0 observations in 4+ weeks). Signal: conscious choice or drift?
+
+Stalls and dormant domains are high-value nudge material — they represent things the user cares about but isn't acting on.
 
 ### 3. Timing Awareness
 
@@ -43,7 +47,7 @@ Read calendar and entities for upcoming events in the next 2-4 weeks. Look for t
 
 Read patterns and recent observations. Project forward: "If this continues for 2 more weeks, what happens?"
 
-**Scenario candidate detection**: If a pattern reveals a genuine fork — two different paths with real stakes and a closing window — flag it as a scenario candidate.
+**Scenario candidate detection**: If a pattern projection reveals a genuine fork — two meaningfully different paths with real stakes and a closing decision window — flag it as a scenario candidate below the main nudge. A valid candidate needs: a fork (2+ paths), stakes (wrong choice has real cost), and time sensitivity (window closing). Don't flag routine decisions or hypotheticals with no deadline.
 
 ### 5. Write One Strategic Nudge
 
@@ -63,25 +67,42 @@ Write to `memory/cog-meta/foresight-nudge.md`:
 <!-- Last updated: YYYY-MM-DD -->
 
 ## Signal
-<What you noticed — from 2+ domains>
+<What you noticed — the raw observation from 2+ domains>
 
 ## Insight
-<Why it matters>
+<Why it matters — the connection, timing, or trajectory that makes this worth flagging>
 
 ## Suggested Action
-<One concrete thing to do>
+<One concrete thing to do — specific, actionable, grounded>
 
 ---
 Sources: [[file1]], [[file2]], [[file3]]
+
+## Scenario Candidate (optional)
+<!-- Only include if pattern projection reveals a genuine fork worth simulating -->
+Decision: <one-line framing>
+Why now: <why the window is closing>
+Domains: <affected domains>
 ```
+
+Overwrite the file each run. One nudge per run.
 
 ## Rules
 
-1. **Read-only** — Foresight NEVER edits memory files. Writes ONLY to `memory/cog-meta/foresight-nudge.md`.
-2. **One nudge, not a list** — force prioritization.
-3. **Evidence-based** — every nudge cites at least 2 source files.
-4. **Forward-looking** — avoid rehashing yesterday.
-5. **Cross-domain preferred** — connecting personal + work is higher value than single-domain.
+1. **Read-only** — Foresight NEVER edits memory files. Writes ONLY to `memory/cog-meta/foresight-nudge.md`. If you spot a memory error, note it in the nudge's signal section and let reflect handle it.
+2. **One nudge, not a list** — force prioritization. If everything is equally important, nothing is.
+3. **Evidence-based** — every nudge cites at least 2 source files. No vibes.
+4. **Non-obvious** — the nudge should surprise. If the user already knows and is acting on it, pick something else.
+5. **Forward-looking** — avoid rehashing yesterday. Project into next week, next month.
+6. **Cross-domain preferred** — nudges that connect personal + work are higher value than single-domain insights.
+
+## Anti-Patterns
+
+- Don't repeat what briefing-bridge already says (stale items, birthday prep) — that's housekeeping's job
+- Don't recommend "reflect on X" — be specific about what to DO
+- Don't flag things the user has explicitly deferred — respect the deferral
+- Don't flag things that are cruising — focus on convergences, stalls, and timing windows
+- Don't write a mini-briefing — one insight, one action
 
 ## Activation
 

@@ -74,12 +74,12 @@ Check if findings are already captured:
 - Distill into a pattern and add/update in `memory/cog-meta/patterns.md` (or domain `patterns.md` if domain-specific)
 - Don't delete the observations — they stay as the raw record
 
-**Core patterns.md size cap — HARD LIMIT: 70 lines / 5.5KB.** After any updates, check the file size. If it exceeds the cap:
-1. Compress multi-line entries to single lines
-2. Merge entries with overlapping lessons
-3. Remove point-in-time data: counts with date ranges, incident tallies with specific dates
-4. Entries must be **timeless rules** — "what to do" not "what happened"
-5. Move domain-specific patterns to satellite files (e.g. `work/acme/patterns.md`) — only universal rules stay in core
+**Pattern file caps — enforce before adding to any file:**
+- Core `patterns.md`: HARD LIMIT **70 lines / 5.5KB** — universal rules only
+- Domain/satellite files: soft cap **30 lines** each
+- If near cap, compress before adding (merge overlapping rules, drop examples, remove temporal data)
+- Entries must be **timeless rules** — "what to do" not "what happened"
+- Move domain-specific patterns to satellite files (e.g. `work/acme/patterns.md`) — only universal rules stay in core
 
 **Pattern routing** — when adding a new pattern, decide where it belongs:
 - **Core** (`cog-meta/patterns.md`) — universal rules that apply every conversation
@@ -107,7 +107,28 @@ For each candidate:
 - If not, note it as a suggestion: "Thread candidate: [topic] — [N] fragments across [date range]"
 - Don't auto-create threads — suggest them
 
-### 3d. Scenario Feedback Loop
+### 3d. Proactive Synthesis Suggestions
+
+Execute this clustering analysis every run:
+
+1. **Gather observations** — Read all `memory/*/observations.md` and `memory/*/*/observations.md` files
+2. **Filter to last 7 days** — Only count entries with dates within the past 7 calendar days
+3. **Cluster by domain** — Group filtered entries by their parent domain folder
+4. **Cluster by topic** — Group filtered entries by recurring keywords, tags, or subjects
+5. **Check trigger conditions** (either one qualifies):
+   - A single domain has **5+ observations** in the last 7 days
+   - A single topic/keyword appears in **5+ observations** across any domains in the last 7 days
+6. **Cross-reference threads** — If a thread already covers the topic, suggest updating it rather than creating new
+7. **Dedup with 3c** — If 3c already flagged the same topic, merge into one suggestion
+8. **Output** — If any clusters qualify, add a **"Synthesis Opportunities"** section to the debrief:
+   ```
+   **Synthesis Opportunities**
+   - [domain or topic]: [N] observations this week — [top 3 entry summaries]. Suggest: raise thread / update existing thread / update hot-memory
+   ```
+9. **Suppress if empty** — If no clusters meet the threshold, omit the heading
+10. **Never auto-synthesize** — Suggest and let the user decide
+
+### 3e. Scenario Feedback Loop
 
 Scan `memory/cog-meta/scenarios/` for active scenario files.
 
@@ -131,10 +152,15 @@ Honestly evaluate:
 Don't just log observations — *fix things*.
 
 **Write:**
-- New self-observations → append to `memory/cog-meta/self-observations.md`. **Cap: max 5 per reflect pass.**
+- New self-observations → append to `memory/cog-meta/self-observations.md`. **Cap: max 5 per reflect pass.** Prioritize highest-signal observations. If you have more than 5, merge lower-signal ones.
 - Pattern updates → edit `memory/cog-meta/patterns.md` in place
 - Improvement ideas → add to `memory/cog-meta/improvements.md`
 - Memory gaps → write to the appropriate domain files
+
+**Triage improvements.md:**
+- Stale ideas (>30 days, no progress) → archive to glacier or mark abandoned
+- Implemented but not moved → move to Implemented section
+- Duplicates → merge similar ideas
 
 **Reorganize:**
 - Entity data that's changed → update in place
@@ -159,6 +185,8 @@ Compose a concise summary:
 - *Scenarios* — active count, any checked/resolved
 
 Keep it honest. If there's nothing notable, say so.
+
+**IMPORTANT**: Your debrief MUST list every file you modified and summarize the changes. Never respond with just "Done" — always enumerate your concrete actions. If you made no changes in a step, state that explicitly.
 
 ## Artifact Formats
 

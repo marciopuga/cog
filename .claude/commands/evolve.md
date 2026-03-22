@@ -63,10 +63,33 @@ For each proposal:
 - What problem does it solve?
 - What evidence supports it?
 - What's the risk?
+- Is this a rule change (apply directly) or architecture change (propose for user review)?
 
-**Apply rule changes directly** to the relevant skill files if clearly beneficial and low-risk. For changes that affect user-facing behavior, note them as proposals for user review.
+**Apply low-risk rule changes directly** to the relevant skill files. Propose architecture changes for user review.
 
-### 4. Write Observations & Update Log
+### 4. Route Content Issues
+
+When you spot content problems during your audit, **don't fix them and don't defer them for yourself**. Route them explicitly:
+
+Format in debrief:
+```
+→ housekeeping: entities.md at 290 lines, needs glacier pass
+→ reflect: hot-memory missing thread link for X
+→ reflect: patterns.md has stale snapshot data from Feb
+```
+
+If the same content issue keeps appearing across runs, that's a **rule problem** — propose a rule change so housekeeping/reflect catch it themselves.
+
+### 5. Generate Scorecard
+
+Overwrite `memory/cog-meta/scorecard.md` with current metrics:
+- Core patterns.md: line count / 70, byte size / 5.5KB (target: ≤1.0)
+- Satellite pattern files: list each with line count (soft cap: 30)
+- Entity compression ratio: `(total entity lines across all files) / (total ### entries)` — target ≤3.0
+- Hot-memory line counts vs caps
+- Briefing bridge SSOT compliance (% of lines with [[source]] links)
+
+### 6. Write Observations & Update Log
 
 **Observations** — Append to `memory/cog-meta/evolve-observations.md`:
 - Format: `- YYYY-MM-DD [tag]: observation`
@@ -74,15 +97,17 @@ For each proposal:
 
 **Evolve Log** — Append to `memory/cog-meta/evolve-log.md`:
 - Run number, process effectiveness findings, rule changes applied or proposed, deferred items
-- Update "Next Run Priorities" section at top
+- Content issues routed (→ housekeeping / → reflect)
+- Update "Next Run Priorities" section at top. **Only architecture/design items — never content work.**
 
-### 5. Debrief
+### 7. Debrief
 
 Concise summary:
 - *Process health* — did housekeeping/reflect follow their rules?
 - *Rule changes* — applied or proposed, with rationale
+- *Routed issues* — content problems sent to housekeeping/reflect
 - *Architecture notes* — structural observations
-- *Next evolve* — top 3 things to check next time
+- *Next evolve* — top 3 architecture priorities
 
 Keep it actionable. Numbers over narrative.
 
