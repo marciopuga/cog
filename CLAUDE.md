@@ -156,7 +156,7 @@ The `/reflect` skill reads recent session transcripts to review interactions, ca
 When responding to any query:
 
 1. **Identify domain** — match query to a domain via file structure knowledge
-2. **L0 scan if uncertain** — if multiple files could be relevant, grep L0 headers in the domain directory before opening files
+2. **L0 scan** — once you know the domain, run `grep -rn "<!-- L0:" memory/{domain}/` to get all file summaries in one call. This replaces reading INDEX.md — faster and fewer tokens. Use this to pick the right file(s) before opening anything.
 3. **Select files by query type:**
    - Schedule, tasks → action-items.md + calendar.md
    - Person, "who is" → entities.md

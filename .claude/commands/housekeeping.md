@@ -1,5 +1,23 @@
 Use this skill to perform memory housekeeping. Trigger if the user says "housekeeping", "clean up memory", "prune memory", "archive old data", or similar maintenance requests.
 
+## 0. Orientation (run FIRST, before any file reads)
+
+Use these shell commands to scope your work before reading files:
+
+```bash
+# What changed since last run? Focus here first.
+find memory/ -type f -name "*.md" -mtime -1 | sort
+
+# Quick entry counts for archival threshold checks (>50 = archive)
+# Add paths for any domain observations files that exist
+grep -c "^- " memory/cog-meta/self-observations.md memory/personal/observations.md memory/*/observations.md memory/*/*/observations.md 2>/dev/null
+
+# Completed action items count (>10 = archive)
+grep -c "^\- \[x\]" memory/personal/action-items.md memory/*/action-items.md memory/*/*/action-items.md 2>/dev/null
+```
+
+Only read files that need work based on these results. Skip unchanged files.
+
 ## 1. Garbage Collect Memory
 
 Review and archive stale data per CLAUDE.md glacier rules. All glacier files must have YAML frontmatter.

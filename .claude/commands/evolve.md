@@ -22,6 +22,26 @@ Measure (don't edit content):
 - `memory/cog-meta/patterns.md`
 - Any domain satellite pattern files (e.g. `work/*/patterns.md`)
 
+## Orientation (run FIRST, before any file reads)
+
+Use these shell commands to see exactly what changed since last run:
+
+```bash
+# What did housekeeping and reflect change recently?
+git diff HEAD~1 --stat memory/
+
+# Detailed diff of architectural files (what you care about)
+git diff HEAD~1 memory/cog-meta/patterns.md memory/hot-memory.md CLAUDE.md
+
+# What changed in the last 24h?
+find memory/ -type f -name "*.md" -mtime -1 | sort
+
+# Current prompt weight components (quick file sizes)
+wc -c memory/hot-memory.md memory/cog-meta/patterns.md memory/cog-meta/briefing-bridge.md 2>/dev/null
+```
+
+Use git diffs to understand what housekeeping/reflect actually did, instead of re-reading entire files.
+
 ## Process
 
 ### 1. Architecture Review

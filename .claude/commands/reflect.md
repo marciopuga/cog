@@ -11,6 +11,23 @@ If you spot issues in these files, note them in self-observations and evolve wil
 
 Self-improvement — pattern recognition, memory maintenance, knowledge base quality.
 
+## Orientation (run FIRST, before any file reads)
+
+Use these shell commands to scope your work before reading files:
+
+```bash
+# What changed since last run? Focus here.
+find memory/ -type f -name "*.md" -mtime -1 | sort
+
+# L0 summaries for all domains — quick routing without opening INDEX.md files
+grep -rn "<!-- L0:" memory/ --include="*.md" | grep -v glacier/ | sort
+
+# Entry counts for files approaching archival threshold
+grep -c "^- " memory/cog-meta/self-observations.md memory/personal/observations.md memory/*/observations.md memory/*/*/observations.md 2>/dev/null
+```
+
+Focus on recently-changed files. Skip files that haven't been modified since last run.
+
 ## Memory Files
 
 Read these files on activation:
