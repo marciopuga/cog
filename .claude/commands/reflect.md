@@ -1,6 +1,6 @@
 Use this skill for self-reflection and improvement. Trigger if the user says "reflect", "what have you learned", "how can you improve", "review yourself", or similar introspection requests.
 
-**You have time and freedom.** This is a deep session — don't rush. Read broadly, cross-reference thoroughly, and ACT on what you find. You are not just observing — you are the maintainer of the knowledge base. Reorganize files, condense observations, archive stale data, fill gaps, fix contradictions. Leave things better than you found them.
+**You have time and freedom.** This is a deep session — don't rush. Read broadly, cross-reference thoroughly, and ACT on what you find. You are not just observing — you are the maintainer of the knowledge base. Reorganize files, consolidate observations, archive stale data, fill gaps, fix contradictions. Leave things better than you found them.
 
 **File boundaries — do NOT modify these files (owned by other pipeline steps):**
 - `cog-meta/evolve-log.md` — owned by evolve
@@ -85,9 +85,9 @@ Check if findings are already captured:
 5. **Cross-domain entity check**: If the same person appears in multiple `entities.md` files across domains, check for fact duplication. Domain-specific context is fine, but shared facts should live in one place. Flag duplicates.
 6. **Report**: Add a "Contradictions" section listing what was found and fixed.
 
-### 3. Run Condensation Check + Hot-Memory Relevance
+### 3. Run Consolidation Check + Hot-Memory Relevance
 
-**Condensation** — Scan all `observations.md` files and `cog-meta/self-observations.md` for clusters of 3+ entries on the same theme/tag. For each cluster found:
+**Consolidation** — Scan all `observations.md` files and `cog-meta/self-observations.md` for clusters of 3+ entries on the same theme/tag. For each cluster found:
 - Distill into a pattern and add/update in `memory/cog-meta/patterns.md` (or domain `patterns.md` if domain-specific)
 - Don't delete the observations — they stay as the raw record
 
@@ -183,7 +183,7 @@ Don't just log observations — *fix things*.
 - Entity data that's changed → update in place
 - When creating or restructuring any memory file, ensure it has an L0 header
 
-**Condense:**
+**Consolidate:**
 - Observation clusters (3+ on same theme) → distill into patterns.md
 - Action items marked done → verify and clean up
 

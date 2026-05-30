@@ -97,13 +97,13 @@ memory/
 Threads are **read-optimized synthesis files**. While observations capture raw events (write-optimized), threads pull related fragments into a coherent narrative. One file per topic, consistent spine:
 
 - **Current State** — what's true right now (rewrite freely, always current)
-- **Timeline** — dated entries, append-only, full detail preserved (never condensed)
+- **Timeline** — dated entries, append-only, full detail preserved (never compressed)
 - **Insights** — learnings, patterns, what's different this time
 
 **Raising a thread:** "Raise" is the verb for creating or updating a thread. A thread gets raised when a topic appears in 3+ observations across 2+ weeks, or when the user says "raise X" or "thread X". Search observations and memory files for all references, synthesize the narrative arc, write or update the thread with the spine structure, and link source fragments via wiki-links.
 
 **Rules:**
-- **One file forever** — threads grow long, they don't split or condense
+- **One file forever** — threads grow long, they don't split or compress
 - **Texture is the value** — every entry keeps its full detail, quotes, and dates
 - **Fragments never move** — threads reference them, don't replace them
 - **Current State is always current** — rewrite it freely as things change
@@ -145,8 +145,8 @@ The `/reflect` skill reads recent session transcripts to review interactions, ca
    - **Write-time back-linking**: When you add a link A→B, ask: "does B benefit from pointing back to A?" If yes, open B and add `[[A]]` where relevant. Not every link needs a reciprocal — only add B→A when B genuinely gains context.
    - **Discovery via link-index**: To find what connects to a file you're reading, check `memory/link-index.md`.
    - Housekeeping runs a link audit as a safety net
-10. **Progressive condensation**: Two processes:
-   - **Condensation**: `observations.md` (append) → `patterns.md` (distill 3+ on same theme) → `hot-memory.md` (rewrite freely). Each layer is smaller and more actionable.
+10. **Consolidation**: Like a brain consolidating memory during sleep, two processes:
+   - **Consolidation**: `observations.md` (append) → `patterns.md` (distill 3+ on same theme) → `hot-memory.md` (rewrite freely). Episodic events abstract upward into durable patterns; each layer is smaller and more actionable.
    - **Archival**: Old observations (>50) → `glacier/` (indexed, retrievable). Resolved patterns → remove from hot-memory, keep in patterns.
      During /reflect: check if any observation clusters should promote to patterns.
      During /housekeeping: check if any patterns should promote/demote from hot-memory.
@@ -239,7 +239,7 @@ Cog includes pipeline skills that maintain memory health. Run them manually or s
 | Skill | Purpose | Suggested schedule |
 |-------|---------|-------------------|
 | `/housekeeping` | Archive, prune, link audit, glacier index | Weekly or nightly |
-| `/reflect` | Mine conversations, condense patterns, detect threads | Weekly or nightly |
+| `/reflect` | Mine conversations, consolidate patterns, detect threads | Weekly or nightly |
 | `/evolve` | Audit architecture, propose rule changes | Weekly |
 | `/foresight` | Cross-domain strategic nudge | Daily (morning) |
 

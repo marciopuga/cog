@@ -49,7 +49,7 @@ Use git diffs to understand what housekeeping/reflect actually did, instead of r
 Evaluate the structural design:
 
 - **Tier design** — are the tiers (hot-memory → patterns → observations → glacier) well-defined?
-- **Condensation pipeline** — is the flow working? Where does it leak or stall?
+- **Consolidation pipeline** — is the flow working? Where does it leak or stall?
 - **File naming and organization** — any files in wrong domains? Orphaned files?
 - **Skill boundaries** — are housekeeping/reflect/evolve boundaries clean? Any drift?
 
@@ -64,7 +64,7 @@ Review the output of recent housekeeping and reflect runs:
 - Is entity format enforcement catching violations?
 
 **Reflect rules check:**
-- Did condensation produce useful patterns, or noise?
+- Did consolidation produce useful patterns, or noise?
 - Did thread candidate detection work?
 - Is reflect staying in its lane?
 - Are patterns routing to the right file (core vs satellite)?

@@ -8,7 +8,7 @@ A plain-text cognitive architecture for Claude Code — simple by design, so the
 
 Cog is a set of conventions — not code — that teach Claude Code how to build and maintain its own memory. You define the rules in plain text. Claude scaffolds the structure and follows them. The filesystem is the interface.
 
-There is no server, no runtime, no application code. `CLAUDE.md` contains the conventions — how to tier memory, when to condense, how to route queries, when to archive. The skill files (`.claude/commands/*.md`) teach Claude specific workflows: reflection, foresight, housekeeping, self-evolution. Claude reads these instructions and follows them to organize, maintain, and grow a persistent knowledge base across sessions.
+There is no server, no runtime, no application code. `CLAUDE.md` contains the conventions — how to tier memory, when to consolidate, how to route queries, when to archive. The skill files (`.claude/commands/*.md`) teach Claude specific workflows: reflection, foresight, housekeeping, self-evolution. Claude reads these instructions and follows them to organize, maintain, and grow a persistent knowledge base across sessions.
 
 Everything is plain text [by design](https://lab.puga.com.br/cog/#/why-text). Not as a compromise — because plain text is what makes this work. Memory files are just markdown, which means Claude can `grep` for patterns, `find` what changed, `wc` to check file sizes, and `git diff` to see what the last pipeline run touched. The same Unix tools that make Linux powerful make Cog's memory observable and maintainable.
 
@@ -41,7 +41,7 @@ If you'd rather review everything manually, delete `.claude/settings.json` and C
 
 ## How It Works
 
-`CLAUDE.md` defines the conventions below. Claude reads them at the start of every session and follows them to decide where to store facts, when to condense, how to route queries, and when to archive. The `memory/` directory is the state that emerges from following these rules over time.
+`CLAUDE.md` defines the conventions below. Claude reads them at the start of every session and follows them to decide where to store facts, when to consolidate, how to route queries, and when to archive. The `memory/` directory is the state that emerges from following these rules over time.
 
 ### Three-Tier Memory
 
@@ -104,15 +104,15 @@ Here's what builds up over time. None of this is pre-filled — it emerges from 
 
 Heavy entries get promoted to thread files — the entity stub just links: `→ [[work/acme/sarah-chen]]`.
 
-### Progressive Condensation
+### Consolidation
 
-Two processes:
+Memory moves the way a brain consolidates it during sleep — raw experience gets replayed, abstracted, and filed where it belongs. Two processes:
 
-**Condensation:** observations → patterns → hot-memory. Each layer is smaller and more actionable than the one below.
+**Consolidation:** observations → patterns → hot-memory. Episodic events (what happened) are abstracted into durable patterns (what's true), and the most actionable few surface into hot-memory. Each layer up is smaller and more distilled than the one below.
 
 **Archival:** old observations → glacier. Indexed, retrievable, out of the way.
 
-Nothing is deleted — it moves to the right place.
+Nothing is deleted — like long-term memory, it's relocated and abstracted, never destroyed. (Where a brain is lossy, Cog keeps the source episodes in glacier — consolidation you can scroll back through.)
 
 ### Threads — The Zettelkasten Layer
 
@@ -124,7 +124,7 @@ Every thread has the same spine:
 - **Timeline** — dated entries, append-only, full detail preserved
 - **Insights** — patterns, learnings, what's different this time
 
-A thread gets raised when a topic appears in 3+ observations across 2+ weeks, or when you say "raise X" or "thread X". Threads grow long — that's the point. The texture is the value. One file forever, never condensed.
+A thread gets raised when a topic appears in 3+ observations across 2+ weeks, or when you say "raise X" or "thread X". Threads grow long — that's the point. The texture is the value. One file forever, never compressed.
 
 Fragments (observations) never move. Threads reference them via wiki-links.
 
@@ -171,7 +171,7 @@ Built-in skills in `.claude/commands/`:
 |-------|-------------|
 | `/setup` | Conversational domain setup |
 | `/personal` | Family, health, calendar, day-to-day |
-| `/reflect` | Mine conversations, extract patterns, condense |
+| `/reflect` | Mine conversations, extract patterns, consolidate |
 | `/evolve` | Audit memory architecture, propose rule changes |
 | `/foresight` | Cross-domain strategic nudge |
 | `/scenario` | Decision simulation with timeline overlay |
@@ -188,7 +188,7 @@ Cog includes pipeline skills that maintain memory health over time. Run them man
 
 ```
 /housekeeping    # Archive stale data, prune hot-memory, rebuild indexes
-/reflect         # Mine recent work, condense patterns, detect threads
+/reflect         # Mine recent work, consolidate patterns, detect threads
 /evolve          # Audit architecture, check rule effectiveness
 /foresight       # Cross-domain scan, surface one strategic nudge
 ```
