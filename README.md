@@ -130,6 +130,34 @@ Fragments (observations) never move. Threads reference them via wiki-links.
 
 See the full [Thread Framework documentation](https://lab.puga.com.br/cog/#/memory) for details.
 
+### Retrieval — The Memory Router
+
+Before reading anything deeply, Claude has to find the *right* file. There's no search index and no database — retrieval is just Claude applying routing conventions from `CLAUDE.md` over plain markdown, using the same Unix tools it already knows.
+
+The workflow is three moves:
+
+1. **Identify the domain** — map the query to an area of life. "Who's on my team?" → `work/`. "What's on today?" → `personal/`.
+2. **Scan L0 summaries** — one `grep` returns every file's one-line header, so Claude picks the right file without opening any:
+
+   ```bash
+   grep -rn "<!-- L0:" memory/personal/
+   ```
+
+3. **Read what's needed** — open the chosen file (using the L0/L1/L2 depth protocol below).
+
+Routing is convention, not code — the query type points at the file:
+
+| Query | Routes to |
+|-------|-----------|
+| "What's on today?" | `personal/calendar.md` |
+| "Who's on my team?" | `work/<domain>/entities.md` |
+| "Update my action items" | `<domain>/action-items.md` |
+| "How's the typing going?" | `personal/keyboard-typing.md` (thread) |
+
+Because it's all plain text, the router is observable: you can run the same `grep` Claude runs and see exactly what it sees. No black box.
+
+Each file also has an **edit mode** that governs how it's written, not just read: `observations.md` is append-only (never edit the past), `entities.md` and `action-items.md` are edited in place, `hot-memory.md` is rewritten freely, and `glacier/` is read-only. Knowing the edit mode is half of knowing how a file behaves.
+
 ### L0 / L1 / L2 Tiered Loading
 
 Every memory file has a one-line summary: `<!-- L0: what's in this file -->`. This is the first tier of a three-level retrieval protocol:
