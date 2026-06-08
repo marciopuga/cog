@@ -2,7 +2,7 @@
 
 A plain-text memory system for AI agents. Clone it, point your agent at it, start remembering.
 
-**[Documentation](https://cog.puga.com.br)** | **[Skills](https://github.com/marciopuga/cog-skills)** | **[Why Text](https://cog.puga.com.br/#/why-text)**
+**[Documentation](https://lab.puga.com.br/cog/)** | **[Skills](https://github.com/marciopuga/cog-skills)** | **[Why Text](https://lab.puga.com.br/cog/#/why-text)**
 
 ## What is Cog?
 
