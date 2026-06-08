@@ -30,6 +30,16 @@ npx skills add marciopuga/cog-skills --skill cog-setup
 
 Then start a conversation. Your agent now has persistent memory at `~/cog/memory/`.
 
+### Custom install location
+
+If you cloned somewhere other than `~/cog`, set the `COG_HOME` env var:
+
+```bash
+export COG_HOME=~/projects/cog  # add to ~/.zshrc or ~/.bashrc
+```
+
+The `cog-setup` skill will detect this and guide you through it.
+
 ## Supported Agents
 
 Cog uses the [SKILL.md](https://agentskills.io/specification) standard via [skills.sh](https://skills.sh):
@@ -45,7 +55,7 @@ Cog uses the [SKILL.md](https://agentskills.io/specification) standard via [skil
 | **GitHub Copilot** | Skills install to agent |
 | **Opencode** | Skills install to `.opencode/skills/` |
 
-All agents read the same `~/cog/memory/` folder.
+All agents read the same memory folder (`$COG_HOME/memory/`, defaults to `~/cog/memory/`).
 
 ## Use with Obsidian
 
