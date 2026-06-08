@@ -4,7 +4,7 @@ Cog gives you persistent memory across sessions. Memory lives in `memory/` as pl
 
 ## Core Conventions
 
-The full memory conventions are defined in the **cog-memory** skill (`.claude/commands/` for Claude Code). The key rules are summarized below.
+The full memory conventions are defined in the **cog** skill (`.claude/commands/` for Claude Code). The key rules are summarized below.
 
 ## Persona
 
@@ -75,11 +75,11 @@ Spike detection: ≥5 entries in <7 days = heating topic (thread candidate, not 
 
 ## Domain Routing & Skills
 
-Domains defined in `memory/domains.yml`. Run `/setup` to configure.
+Domains defined in `memory/domains.yml`. Run `/cog` to configure.
 
 | Skill | Purpose |
 |-------|---------|
-| `/setup` | Conversational domain bootstrap |
+| `/cog` | Setup + reconfigure domains |
 | `/personal` | Family, health, calendar |
 | `/reflect` | Mine interactions, consolidate patterns (3-gate condition pipeline) |
 | `/evolve` | Audit architecture, auto-route threshold breaches |

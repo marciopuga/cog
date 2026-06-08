@@ -23,7 +23,7 @@ cd ~/cog
 npx skills add marciopuga/cog-skills
 ```
 
-Start your agent and run `/setup` to bootstrap your domains. Your agent now has persistent memory at `~/cog/memory/`.
+Start your agent and run `/cog` to bootstrap your domains. Your agent now has persistent memory at `~/cog/memory/`.
 
 **One folder, many projects.** `~/cog` is your agent's single brain — it works across every project and session. Don't scaffold memory inside each project. That fragments your context. One place where everything connects.
 
