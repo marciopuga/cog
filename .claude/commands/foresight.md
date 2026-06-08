@@ -1,109 +1,110 @@
-Use this skill for strategic foresight — connecting dots across domains and surfacing one high-value nudge. Trigger if the user says "foresight", "what should I be thinking about", "what am I missing", "strategic nudge", "connect the dots", or similar forward-looking synthesis requests.
+---
+name: foresight
+description: >
+  Cross-domain strategic scan. Detects convergence between life areas,
+  velocity changes, and upcoming timing windows. Writes one actionable
+  nudge per run. Invoke with /foresight.
+---
 
-**This is NOT /reflect.** Reflect = past-facing (mines interactions, fixes contradictions). Foresight = future-facing (scans broadly, projects trajectories, surfaces opportunities).
+# Cog Foresight
 
-**This is NOT /evolve.** Evolve = system architecture. Foresight = life/work strategy.
+Strategic foresight — connecting dots across domains. Future-facing.
 
-## Domain
+**This is NOT /cog-reflect** (past-facing) or **/cog-evolve** (system architecture). Foresight scans broadly and projects trajectories.
 
-Cross-domain strategic synthesis — personal, work, projects, health, family. The value is in the connections *between* domains.
+## Memory Path
 
-## Memory Files
+All files under `~/cog/memory/`.
 
-Read broadly — this is a scan, not a focused lookup:
+## Minimum Data Check
+
+Before scanning, verify there's enough material for meaningful foresight:
+- If total observations across all domains < 10: stop. Say "Not enough history for strategic foresight. Keep capturing for a few more weeks."
+- If only 1 domain has data: say "Foresight works best with 2+ active domains (it connects dots between them). Consider adding more domains or building out existing ones."
+- If no action items exist: say "No active items to assess velocity on. Capture some tasks first."
+
+Don't force a nudge from thin data. One honest "not yet" is better than a weak insight.
+
+## Files to Read
+
+Read broadly — this is a scan:
 
 1. Read `memory/domains.yml` to discover all active domains
-2. For each domain, read `hot-memory.md` and `action-items.md` (if they exist)
+2. For each domain: `hot-memory.md` + `action-items.md`
 3. Also read:
-   - `memory/hot-memory.md` (cross-domain strategic context)
-   - `memory/personal/entities.md` (upcoming birthdays, relationships)
-   - `memory/personal/calendar.md` (what's coming up)
+   - `memory/hot-memory.md` (cross-domain context)
+   - `memory/personal/entities.md` (birthdays, relationships)
+   - `memory/personal/calendar.md` (upcoming events)
    - `memory/personal/health.md` (health trajectory)
-   - `memory/cog-meta/briefing-bridge.md` (housekeeping findings)
    - Recent observations across all domains (last 7 days)
-   - Thread current-state sections — what narratives are actively unfolding?
+   - Thread current-state sections
 
 ## Process
 
-### 1. Cross-Domain Convergence Scan
+### 1. Cross-Domain Convergence
 
 Look for topics, people, or themes appearing in 2+ domains simultaneously. These are convergence points — where effort in one area compounds into another.
 
 ### 2. Velocity & Stall Detection
 
-Scan action-items across all domains. Classify each active item:
-- **Accelerating** — multiple updates in the last week, clear momentum. Signal: ride the wave, don't interrupt.
-- **Cruising** — steady progress, on track. Signal: nothing to flag.
-- **Stalling** — no movement in 2+ weeks despite not being deferred. Signal: ask why. Blocked? Lost priority?
-- **Dormant** — domain-level silence (0 observations in 4+ weeks). Signal: conscious choice or drift?
-
-Stalls and dormant domains are high-value nudge material — they represent things the user cares about but isn't acting on.
+Classify active items:
+- **Accelerating** — multiple updates last week. Signal: ride the wave.
+- **Cruising** — steady progress. Signal: nothing to flag.
+- **Stalling** — no movement 2+ weeks. Signal: blocked or lost priority?
+- **Dormant** — domain silence 4+ weeks. Signal: conscious or drift?
 
 ### 3. Timing Awareness
 
-Read calendar and entities for upcoming events in the next 2-4 weeks. Look for timing windows — things that should start NOW to be ready later.
+Read calendar and entities for events in next 2-4 weeks. Things that should start NOW to be ready later.
 
 ### 4. Pattern Projection
 
-Read patterns and recent observations. Project forward: "If this continues for 2 more weeks, what happens?"
-
-**Scenario candidate detection**: If a pattern projection reveals a genuine fork — two meaningfully different paths with real stakes and a closing decision window — flag it as a scenario candidate below the main nudge. A valid candidate needs: a fork (2+ paths), stakes (wrong choice has real cost), and time sensitivity (window closing). Don't flag routine decisions or hypotheticals with no deadline.
+Read patterns and recent observations. Project: "If this continues 2 more weeks, what happens?"
 
 ### 5. Write One Strategic Nudge
 
 Synthesize into **one nudge**. Not a list. One thing.
 
 The nudge must:
-- **Cite at least 2 source files**
-- **Be something the user hasn't explicitly asked about**
-- **Be actionable** — not "think about X" but "do Y because of X and Z"
-- **Connect dots**
+- Cite at least 2 source files
+- Be something the user hasn't explicitly asked about
+- Be actionable — "do Y because of X and Z" (not "think about X")
+- Connect dots across domains
 
 Write to `memory/cog-meta/foresight-nudge.md`:
 
 ```markdown
 # Foresight Nudge
-<!-- Auto-generated by strategic foresight. -->
 <!-- Last updated: YYYY-MM-DD -->
 
 ## Signal
-<What you noticed — the raw observation from 2+ domains>
+<What you noticed — raw observation from 2+ domains>
 
 ## Insight
-<Why it matters — the connection, timing, or trajectory that makes this worth flagging>
+<Why it matters — the connection or trajectory>
 
 ## Suggested Action
-<One concrete thing to do — specific, actionable, grounded>
+<One concrete thing to do>
 
 ---
-Sources: [[file1]], [[file2]], [[file3]]
-
-## Scenario Candidate (optional)
-<!-- Only include if pattern projection reveals a genuine fork worth simulating -->
-Decision: <one-line framing>
-Why now: <why the window is closing>
-Domains: <affected domains>
+Sources: [[file1]], [[file2]]
 ```
 
-Overwrite the file each run. One nudge per run.
+Overwrite each run. One nudge per run.
 
 ## Rules
 
-1. **Read-only** — Foresight NEVER edits memory files. Writes ONLY to `memory/cog-meta/foresight-nudge.md`. If you spot a memory error, note it in the nudge's signal section and let reflect handle it.
-2. **One nudge, not a list** — force prioritization. If everything is equally important, nothing is.
-3. **Evidence-based** — every nudge cites at least 2 source files. No vibes.
-4. **Non-obvious** — the nudge should surprise. If the user already knows and is acting on it, pick something else.
-5. **Forward-looking** — avoid rehashing yesterday. Project into next week, next month.
-6. **Cross-domain preferred** — nudges that connect personal + work are higher value than single-domain insights.
+1. **Read-only** — foresight NEVER edits memory files. Only writes `foresight-nudge.md`.
+2. **One nudge** — force prioritization.
+3. **Evidence-based** — cite 2+ source files.
+4. **Non-obvious** — should surprise. If the user already knows, pick something else.
+5. **Forward-looking** — project into next week/month.
+6. **Cross-domain preferred** — connections between domains are highest value.
 
 ## Anti-Patterns
 
-- Don't repeat what briefing-bridge already says (stale items, birthday prep) — that's housekeeping's job
+- Don't repeat what housekeeping already flagged (stale items, birthdays)
 - Don't recommend "reflect on X" — be specific about what to DO
-- Don't flag things the user has explicitly deferred — respect the deferral
-- Don't flag things that are cruising — focus on convergences, stalls, and timing windows
+- Don't flag explicitly deferred items
+- Don't flag things that are cruising
 - Don't write a mini-briefing — one insight, one action
-
-## Activation
-
-Read broadly across all domains. Find the one thing worth saying.

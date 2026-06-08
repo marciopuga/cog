@@ -1,189 +1,162 @@
-Use this skill to perform memory housekeeping. Trigger if the user says "housekeeping", "clean up memory", "prune memory", "archive old data", or similar maintenance requests.
+---
+name: housekeeping
+description: >
+  Archive old observations, prune stale items, rebuild indexes,
+  enforce entity format, and maintain memory health. Run weekly
+  to prevent memory bloat. Invoke with /housekeeping.
+---
 
-## 0. Orientation (run FIRST, before any file reads)
+# Cog Housekeeping
 
-Use these shell commands to scope your work before reading files:
+Memory maintenance — archive, prune, index, enforce format. The janitor.
 
-```bash
-# What changed since last run? Focus here first.
-find memory/ -type f -name "*.md" -mtime -1 | sort
+## Memory Path
 
-# Quick entry counts for archival threshold checks (>50 = archive)
-# Add paths for any domain observations files that exist
-grep -c "^- " memory/cog-meta/self-observations.md memory/personal/observations.md memory/*/observations.md memory/*/*/observations.md 2>/dev/null
+All files under `~/cog/memory/`.
 
-# Completed action items count (>10 = archive)
-grep -c "^\- \[x\]" memory/personal/action-items.md memory/*/action-items.md memory/*/*/action-items.md 2>/dev/null
-```
+## Orientation (run first)
 
-Only read files that need work based on these results. Skip unchanged files.
+Scope your work:
+1. Find files changed since last run
+2. Check observation entry counts (>50 = archive threshold)
+3. Check completed action item counts (>10 = archive threshold)
 
-## 1. Garbage Collect Memory
+Only read files that need work. Skip unchanged files.
 
-Review and archive stale data per CLAUDE.md glacier rules. All glacier files must have YAML frontmatter.
+### Minimum Data Check
+
+Before proceeding, verify there's enough material to maintain:
+- If no observations files exist or all are empty: stop. Say "Nothing to maintain yet. Start by capturing some observations and the system will grow."
+- If all entry counts are well below thresholds (obs < 10, items < 3): say "Memory is still light. No maintenance needed yet — keep building."
+
+Don't run a full pipeline over an empty system. Acknowledge and exit early.
+
+## Process
+
+### 1. Garbage Collect
+
+Archive stale data per glacier rules. All glacier files need YAML frontmatter.
 
 **Observations — archive by primary tag:**
-- If any `observations.md` has >50 entries, group oldest entries by primary tag and move to `memory/glacier/{domain}/observations-{tag}.md`
-- If `memory/cog-meta/self-observations.md` has >50 entries, group by primary tag → `memory/glacier/cog-meta/observations-{tag}.md`
+- Any `observations.md` >50 entries → group oldest by primary tag → `glacier/{domain}/observations-{tag}.md`
 
-**Other files — standard rules:**
-- If any `action-items.md` has >10 completed items, move to `memory/glacier/{domain}/action-items-done.md`
-- Apply same logic for all domains listed in `memory/domains.yml`
-- If `memory/cog-meta/improvements.md` has >10 implemented items, move to `memory/glacier/cog-meta/improvements-done-{YYYY}.md`
+**Other files:**
+- `action-items.md` >10 completed → `glacier/{domain}/action-items-done.md`
+- `entities.md` inactive 6+ months → `glacier/{domain}/entities-inactive.md`
 
-## 2. Prune Hot Memory (rule-based)
+### 2. Prune Hot Memory
 
-Keep ALL hot-memory.md files under 50 lines. Relevance judgment (promote/demote) is /reflect's job — you apply structural rules:
+Keep ALL `hot-memory.md` files under 50 lines.
 
-**Files to check:**
-Read `memory/domains.yml` to discover all active domains. Check `hot-memory.md` for each domain, plus the cross-domain `memory/hot-memory.md`.
-
-**Pruning priority (trim in this order):**
-1. **Resolved items** — anything with ~~strikethrough~~, "DONE", "RESOLVED"
-2. **Past events** — entries about dates that have already occurred
-3. **SSOT violations** — same fact in hot-memory AND the canonical file (entities, action-items, etc.). Keep in canonical file, replace hot-memory copy with `[[link]]` or remove
-4. **Stale entries** — items not referenced in 14+ days
-5. **Low-signal entries** — FYI items with no action or deadline
+**Pruning priority:**
+1. Resolved items (strikethrough, "DONE", "RESOLVED")
+2. Past events (dates already occurred)
+3. SSOT violations (same fact in hot-memory AND canonical file)
+4. Stale entries (not referenced 14+ days)
+5. Low-signal entries (FYI with no action or deadline)
 
 **Where trimmed entries go:**
-- Entries with lasting value → append to domain's `observations.md`
-- Entries that are purely historical → let them go
-- Never silently delete — always move or note removal in debrief
+- Lasting value → append to `observations.md`
+- Purely historical → let them go
+- Never silently delete — move or note in debrief
 
-## 3. Surface Opportunities & Accountability
+### 3. Surface Opportunities
 
-Review all `action-items.md` files across every domain:
-- **Stale items** (open >2 weeks): list with age and suggested next action
-- **Dormant domains**: if any domain has 0 new observations in >4 weeks, flag
-- **Health escalation**: items open >6 months get flagged with urgency label
-- **Birthday prep**: if any birthday in entities.md is <2 weeks away, pull interests and suggest ideas
+Review all `action-items.md` across every domain:
+- **Stale items** (open >2 weeks): list with age and suggested action
+- **Dormant domains** (0 observations in >4 weeks): flag
+- **Health escalation** (open >6 months): flag with urgency
+- **Birthday prep** (<2 weeks away): pull interests, suggest ideas
 
-Be direct. Don't just report — recommend specific actions.
+### 4. Temporal Validity Sweep
 
-## 4. Rebuild Glacier Index
+Scan ALL memory files (hot-memory, action-items, entities, threads) for `<!-- until:YYYY-MM-DD -->` and `<!-- until:YYYY-MM-DD grace:N -->` markers:
 
-Scan all `memory/glacier/**/*.md` files. Extract YAML frontmatter. Write results to `memory/glacier/index.md`:
+1. **Compute expiry**: `until_date + grace_days` (grace defaults to 0)
+2. **If expired**: remove the line from its current file
+   - If the line has lasting value → append to `observations.md` with `[archived]` tag
+   - If purely temporal (event countdown, temporary state) → discard
+3. **If expiring within 7 days**: leave in place but add to debrief as "expiring soon"
 
-```
+This is deterministic — no judgment needed. Date math only.
+
+**Do NOT touch `<!-- from:YYYY-MM-DD -->` markers** — those are stable-since markers and never expire.
+
+### 5. Rebuild Indexes (Deterministic)
+
+Rebuild ALL indexes from source of truth — no LLM judgment, pure data extraction.
+
+**5a. Glacier Index**
+
+Scan `memory/glacier/**/*.md`, extract YAML frontmatter, write `memory/glacier/index.md`:
+
+```markdown
 # Glacier Index
-<!-- Auto-generated by housekeeping. Do not edit. -->
+<!-- Auto-generated. Do not edit. -->
 <!-- Last updated: YYYY-MM-DD -->
 
 | File | Domain | Type | Tags | Date Range | Entries | Summary |
 |------|--------|------|------|------------|---------|---------|
 ```
 
-## 5. Link Audit (discover missing links)
+**5b. Domain INDEX.md files**
+
+For each domain directory, read every `.md` file's `<!-- L0: ... -->` header and write `memory/{domain}/INDEX.md`:
+
+```markdown
+# {Domain} Index
+<!-- Auto-generated from L0 headers. Do not edit. -->
+<!-- Last updated: YYYY-MM-DD -->
+
+| File | Summary |
+|------|---------|
+| hot-memory.md | Current state and priorities |
+| observations.md | Timestamped events and learnings |
+```
+
+**Key principle**: These indexes are DETERMINISTIC — computed from L0 headers that already exist. If a file has no L0 header, list it with summary "(no L0 header — needs one)". Never invent summaries; just reflect what's there.
+
+This prevents index drift — the failure mode where LLM-generated indexes silently go stale because the generation step was skipped or failed.
+
+### 6. Link Audit
 
 For each non-glacier memory file:
-1. **Entity mentions**: Scan for names matching `### <Name>` headers in entities.md — add `[[links]]` if missing
-2. **Cross-domain references**: If a file mentions a topic from another domain, add a cross-domain link
-3. **Action item references**: If an observation references a task, link it
+1. Entity mentions matching `### Name` headers → add `[[links]]` if missing
+2. Cross-domain references → add cross-domain links
+3. Action item references → link observations to tasks
 
-Only add links where the reference is substantive.
+### 7. Entity Format Enforcement
 
-## 5b. Entity Registry Format Enforcement
+Scan all `entities.md`:
+1. **3-line max**: Entries >3 lines → compress or flag for thread promotion
+2. **Glacier candidates**: Inactive >6 months → move to glacier (leave stub)
+3. **Missing metadata**: Flag entries without `status:` or `last:` fields
 
-Scan all `entities.md` files for registry format compliance:
+### 8. Rebuild Link Index
 
-1. **3-line max**: Any `### entry` with >3 content lines should be compressed. If the entry has an associated detail file (`→ [[link]]`), compress to: name/relationship, pipe-separated key facts, status+link. If no detail file exists and entry is >5 lines, flag as a promotion candidate (suggest creating a thread file).
-2. **Glacier candidates**: Entries with `status: inactive` or `last:` date >6 months ago → move to `glacier/{domain}/entities-inactive.md` (leave a stub with archived comment).
-3. **Missing metadata**: Flag entries missing `status:` or `last:` fields.
-
-## 5c. Temporal Fact Maintenance
-
-Scan all `entities.md` files for `(until YYYY-MM)` markers with past dates:
-1. If the line has no ~~strikethrough~~, add it
-2. If already struck through, move to a `## Historical` subsection at the bottom of that entity's block (create the subsection if absent)
-3. Report moved facts in the debrief
-
-## 6. Rebuild Link Index
-
-Scan all memory files (excluding `glacier/`) for `[[wiki-links]]`. For each link, record: target → source.
-
-Rewrite `memory/link-index.md`:
+Scan all memory files (exclude glacier) for `[[wiki-links]]`. Write `memory/link-index.md`:
 
 ```markdown
 # Memory Link Index
-<!-- Auto-generated by housekeeping. Do not edit. -->
+<!-- Auto-generated. Do not edit. -->
 <!-- Last updated: YYYY-MM-DD -->
 
 | Target | Linked from |
 |--------|-------------|
-| `personal/entities` | `personal/observations`, `personal/hot-memory` |
 ```
 
-Rules:
-- Only include targets with at least one inbound link
-- Combine multiple sources per target on one row (comma-separated)
-- Exclude glacier files from both source and target
+### 9. L0 Header Maintenance
 
-## 7. Write Briefing Bridge
+Check all files for missing `<!-- L0: ... -->` headers. Add where missing:
+- Read file content
+- Write one-line summary (max 80 chars)
+- Place as first line
 
-Write key findings to `memory/cog-meta/briefing-bridge.md` so foresight can pick them up. Overwrite the file each run.
+### 10. Debrief
 
-**SSOT rule**: Every line in the bridge must include a `[[source]]` link to its canonical file. The bridge summarizes and links — it NEVER introduces original facts.
-
-```markdown
-# Briefing Bridge
-<!-- Auto-generated by housekeeping. Consumed by foresight. -->
-<!-- Last updated: YYYY-MM-DD -->
-
-## Stale Items (>2 weeks)
-- <item> — <age> — suggested action: <action>
-- **Compression rule**: Items stale >4 weeks — group by domain as a single line
-
-## Birthday Prep
-- <name> birthday in <N> days — interests: <from entities> — gift ideas: <suggestions>
-
-## Dormant Domains
-- <domain> — last activity: <date> — recommendation: <shelf/reactivate/shut down>
-
-## Health Escalation
-- <item> — open <N> months — urgency: <high/medium>
-```
-
-Only include sections that have content. Empty sections should be omitted.
-
-## 8. L0 Header Maintenance
-
-Check all active memory files for missing `<!-- L0: ... -->` headers. If a file is missing its L0:
-- Read the file content, write a one-line summary (max 80 chars)
-- Add on the line after the `# Title`
-
-L0 headers are the first tier of the retrieval protocol — they let any skill scan what a file contains before deciding to read it.
-
-## 9. Rebuild Domain Indexes
-
-Regenerate `INDEX.md` for each domain directory. These files power the memory router — the system prompt only shows a light domain table; the model reads INDEX.md on demand to find specific files.
-
-**For each domain** (scan `memory/` for directories, skip `glacier/`):
-1. List all `.md` files in the domain (exclude `INDEX.md`, `hot-memory.md`, and empty files)
-2. Extract the L0 summary from each file (same logic as step 8)
-3. Count total files
-4. Write `memory/{domain}/INDEX.md`:
-
-```markdown
-# {Domain} Index
-<!-- L0: {domain summary} — {N} files -->
-<!-- Auto-generated by housekeeping. Do not edit. -->
-<!-- Last updated: YYYY-MM-DD -->
-
-- **{filename}** — {L0 summary}
-- **{filename}** — {L0 summary}
-...
-```
-
-- Sort entries alphabetically by filename
-- Domain summary: use the `label` from `memory/domains.yml` for the matching domain
-- If a file has no L0, list it as just `**{filename}**` (no summary)
-
-## 10. Compose Debrief
-
-Summarize everything done:
+Summarize:
 - What was archived/pruned
 - Upcoming events flagged
 - Action items surfaced
 - Links added
-
-Keep it concise but informative.
+- Files modified (list each one)

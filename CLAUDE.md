@@ -4,7 +4,7 @@ Cog gives you persistent memory across sessions. Memory lives in `memory/` as pl
 
 ## Core Conventions
 
-The full memory conventions are defined in the **cog-memory** skill. If installed via skills.sh (`npx skills add marciopuga/cog-skills --skill cog-memory`), they load automatically. The key rules are summarized below for Claude Code's native CLAUDE.md loading.
+The full memory conventions are defined in the **cog-memory** skill (`.claude/commands/` for Claude Code). The key rules are summarized below.
 
 ## Persona
 
@@ -39,6 +39,7 @@ Every memory file has `<!-- L0: summary (max 80 chars) -->` as line 1.
 5. **Hot memory <50 lines**
 6. **SSOT**: Each fact in ONE file. Others reference via `[[link]]`.
 7. **Wiki-links**: `[[domain/filename]]` — write-time linking when editing any file
+8. **Temporal validity**: Time-bounded facts carry `<!-- until:YYYY-MM-DD grace:N -->`. Stable-since facts carry `<!-- from:YYYY-MM-DD -->`. Housekeeping sweeps expired markers.
 
 ### File Edit Patterns
 
@@ -56,11 +57,15 @@ Every memory file has `<!-- L0: summary (max 80 chars) -->` as line 1.
 
 Read-optimized synthesis files. Raised when topic appears in 3+ observations across 2+ weeks. Spine: Current State → Timeline → Insights. One file forever.
 
-### Consolidation
+### Consolidation (Condition Pipeline)
 
-```
-observations (append-only) → patterns (distill 3+) → hot-memory (rewrite freely)
-```
+Three gates for observation → pattern promotion:
+
+1. **Cluster**: ≥3 entries, same tag, ≥7-day span, ≥3 distinct dates, specific tag (not "work"/"home")
+2. **Coverage**: Check existing patterns — skip if already covered, REPLACE if new insight subsumes old
+3. **Synthesis**: One actionable line, style-matched, `<!-- promoted:YYYY-MM-DD theme:tag -->` audit trail
+
+Spike detection: ≥5 entries in <7 days = heating topic (thread candidate, not pattern-ready).
 
 ### Glacier
 
@@ -76,10 +81,10 @@ Domains defined in `memory/domains.yml`. Run `/setup` to configure.
 |-------|---------|
 | `/setup` | Conversational domain bootstrap |
 | `/personal` | Family, health, calendar |
-| `/reflect` | Mine interactions, consolidate patterns |
-| `/evolve` | Audit architecture |
+| `/reflect` | Mine interactions, consolidate patterns (3-gate condition pipeline) |
+| `/evolve` | Audit architecture, auto-route threshold breaches |
 | `/foresight` | Cross-domain strategic nudge |
-| `/housekeeping` | Archive, prune, rebuild indexes |
+| `/housekeeping` | Archive, prune, deterministic indexes, temporal sweep |
 | `/history` | Deep memory search |
 | `/scenario` | Decision simulation |
 | `/explainer` | Writing and drafting |
@@ -87,9 +92,14 @@ Domains defined in `memory/domains.yml`. Run `/setup` to configure.
 
 ## Pipeline
 
-Optional maintenance skills. Run manually or schedule:
+Optional maintenance skills. Run consolidated (same session) for best results:
 
 ```bash
-0 23 * * 0  claude -p "$(cat .claude/commands/housekeeping.md)"
-0  0 * * 0  claude -p "$(cat .claude/commands/reflect.md)"
+# Weekly: housekeeping → reflect in one session (reflect sees cleaned state)
+0 23 * * 0  claude -p "/housekeeping then /reflect"
+
+# Monthly: architecture audit
+0  1 1 * *  claude -p "/evolve"
 ```
+
+Anti-pattern: running all skills every night — it's theatrical. Weekly + monthly is enough.
