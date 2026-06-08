@@ -1,12 +1,12 @@
 # Cog
 
-A plain-text memory system for AI agents. Clone it, point your agent at it, start remembering.
+One memory, not one per tool. A centralised, plain-text memory layer shared across all your AI agents and projects.
 
 **[Documentation](https://lab.puga.com.br/cog/)** | **[Skills](https://github.com/marciopuga/cog-skills)** | **[Why Text](https://lab.puga.com.br/cog/#/why-text)**
 
 ## What is Cog?
 
-Every new AI chat starts from scratch. Cog fixes that — persistent memory using plain text files that any agent can read and write.
+AI agents have memory now — but it's siloed. Each tool remembers things its own way, locked inside its own project. Switch tools or start a new project, and you're re-explaining yourself. Cog gives you one shared memory — structured plain-text files that any agent can read, search, and maintain.
 
 Three primitives:
 - **L0 headers** — progressive context loading (scan before you read)
