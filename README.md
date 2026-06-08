@@ -18,17 +18,14 @@ No server, no database, no application code. Just markdown files with convention
 ## Quick Start
 
 ```bash
-# 1. Clone the memory folder
 git clone https://github.com/marciopuga/cog ~/cog
-
-# 2. Install the memory skill (any agent)
-npx skills add marciopuga/cog-skills --skill cog-memory
-
-# 3. Bootstrap your domains interactively
-npx skills add marciopuga/cog-skills --skill cog-setup
+cd ~/cog
+npx skills add marciopuga/cog-skills
 ```
 
-Then start a conversation. Your agent now has persistent memory at `~/cog/memory/`.
+Start your agent and run `/setup` to bootstrap your domains. Your agent now has persistent memory at `~/cog/memory/`.
+
+**One folder, many projects.** `~/cog` is your agent's single brain — it works across every project and session. Don't scaffold memory inside each project. That fragments your context. One place where everything connects.
 
 ### Custom install location
 
@@ -38,22 +35,18 @@ If you cloned somewhere other than `~/cog`, set the `COG_HOME` env var:
 export COG_HOME=~/projects/cog  # add to ~/.zshrc or ~/.bashrc
 ```
 
-The `cog-setup` skill will detect this and guide you through it.
-
 ## Supported Agents
 
-Cog uses the [SKILL.md](https://agentskills.io/specification) standard via [skills.sh](https://skills.sh):
+`npx skills add` auto-detects your agent and installs skills into its native format via [skills.sh](https://skills.sh):
 
-| Agent | How it loads |
-|-------|-------------|
-| **Claude Code** | Reads `CLAUDE.md` natively + skills via `npx skills add` |
-| **Cowork** | Open `~/cog` folder — reads `CLAUDE.md` natively |
-| **Codex** | Skills install to agent, or use `AGENTS.md` |
-| **Cursor** | Skills install, or reference in `.cursorrules` |
-| **Windsurf** | Skills install, or reference in `.windsurfrules` |
-| **Gemini CLI** | Skills install to agent |
-| **GitHub Copilot** | Skills install to agent |
-| **Opencode** | Skills install to `.opencode/skills/` |
+- Claude Code
+- Codex (OpenAI)
+- Cursor
+- Windsurf
+- Gemini CLI
+- GitHub Copilot
+- Opencode
+- Cowork (Claude Desktop)
 
 All agents read the same memory folder (`$COG_HOME/memory/`, defaults to `~/cog/memory/`).
 
@@ -91,28 +84,21 @@ The folder works as both an AI memory system and a human knowledge base. No conf
 
 ## Optional: Automated Maintenance
 
-Install pipeline skills to keep memory clean:
+Schedule pipeline skills with cron. **Run housekeeping → reflect in the same session** so reflect sees freshly-pruned state:
 
 ```bash
-npx skills add marciopuga/cog-skills --skill cog-housekeeping
-npx skills add marciopuga/cog-skills --skill cog-reflect
-npx skills add marciopuga/cog-skills --skill cog-evolve
-npx skills add marciopuga/cog-skills --skill cog-foresight
-```
+# Weekly maintenance pulse
+0 23 * * 0  cd ~/cog && claude -p "/housekeeping then /reflect"
 
-Schedule with cron using any agent's headless mode:
-
-```bash
-# Weekly maintenance
-0 23 * * 0  claude -p "/cog-housekeeping"    # or: codex exec "/cog-housekeeping"
-0  0 * * 0  claude -p "/cog-reflect"         # or: codex exec "/cog-reflect"
+# Monthly architecture audit
+0  1 1 * *  cd ~/cog && claude -p "/evolve"
 ```
 
 The pipeline is optional. Cog works without it — but running it regularly keeps memory clean and surfaces insights you'd miss.
 
 ## How It Works
 
-Your agent reads the cog-memory skill (installed via skills.sh) which teaches it the conventions: how to tier memory, when to consolidate, how to route queries, where to write facts. The `memory/` directory is the state that emerges from following these rules over time.
+`npx skills add` installs SKILL.md files that teach your agent the conventions: how to tier memory, when to consolidate, how to route queries, where to write facts. The `memory/` directory is the state that emerges from following these rules over time.
 
 Everything is observable — run `grep -rn "<!-- L0:" ~/cog/memory/` and you see exactly what your agent sees. No black box.
 
