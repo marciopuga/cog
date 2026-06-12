@@ -1,4 +1,4 @@
-<!-- Auto-generated from domains.yml by /setup. Re-run /setup to regenerate. -->
+<!-- Auto-generated from domains.yml by /cog. Re-run /cog to regenerate. -->
 <!-- Template variables: {{ID}}, {{LABEL}}, {{PATH}}, {{TRIGGERS}}, {{FILES}} -->
 
 Use this skill when the user discusses {{LABEL}} topics. Trigger if the conversation involves:

@@ -14,7 +14,7 @@ Systems-level self-improvement. The architect.
 
 ## Memory Path
 
-All files under `~/cog/memory/`.
+All files under the resolved memory path: `$COG_HOME/memory/` if `COG_HOME` is set, otherwise `~/cog/memory/`.
 
 ## Minimum Data Check
 

@@ -15,7 +15,7 @@ Self-reflection and memory consolidation. Past-facing — mines interactions, fi
 
 ## Memory Path
 
-All files under `~/cog/memory/`.
+All files under the resolved memory path: `$COG_HOME/memory/` if `COG_HOME` is set, otherwise `~/cog/memory/`.
 
 ## Orientation (run first)
 

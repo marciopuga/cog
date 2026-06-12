@@ -2,4 +2,4 @@
 # Hot Memory
 
 <!-- Rewrite freely. Keep under 50 lines. -->
-<!-- Run /setup to populate this with your domains and priorities. -->
+<!-- Run /cog to populate this with your domains and priorities. -->
