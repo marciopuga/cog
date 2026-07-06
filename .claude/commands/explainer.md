@@ -1,3 +1,12 @@
+---
+name: explainer
+description: >
+  Writing and drafting — systematic clarity (Atkins) fused with
+  writing-as-discovery (Montaigne). For articles, essays, posts, talks,
+  and explanations. Invoke with /explainer. Bundled writing extra —
+  not part of the core memory pipeline.
+---
+
 Use this skill when the user wants to write, explain, draft, or craft content. Trigger if the conversation involves:
 - Writing articles, essays, posts, or explanations
 - Drafting long-form pieces
@@ -72,7 +81,7 @@ Same setup, but organize for flexibility, verbalize with reflection, and anticip
 
 ## Memory Files
 
-Read on activation:
+Read on activation (under `$COG_HOME/memory/` if `COG_HOME` is set, otherwise `~/cog/memory/`):
 - `memory/personal/observations.md` for lived experience and reflections
 
 Write to (if producing drafts or notes):

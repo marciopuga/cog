@@ -10,7 +10,7 @@ description: >
 
 Strategic foresight — connecting dots across domains. Future-facing.
 
-**This is NOT /cog-reflect** (past-facing) or **/cog-evolve** (system architecture). Foresight scans broadly and projects trajectories.
+**This is NOT reflect** (past-facing) or **evolve** (system architecture). Foresight scans broadly and projects trajectories.
 
 ## Memory Path
 
@@ -61,6 +61,8 @@ Read calendar and entities for events in next 2-4 weeks. Things that should star
 
 Read patterns and recent observations. Project: "If this continues 2 more weeks, what happens?"
 
+If the projection surfaces a **decision fork with stakes** — 2+ meaningfully different paths, real cost to choosing wrong, a closing window — flag it as a scenario candidate in the nudge (see template below). Check `memory/cog-meta/scenarios/` first; don't re-flag a decision that already has an active scenario.
+
 ### 5. Write One Strategic Nudge
 
 Synthesize into **one nudge**. Not a list. One thing.
@@ -86,15 +88,22 @@ Write to `memory/cog-meta/foresight-nudge.md`:
 ## Suggested Action
 <One concrete thing to do>
 
+## Scenario Candidate
+<Only if step 4 found a decision fork with stakes:
+"Decision: <one-line>. Run the scenario skill to model the branches."
+Omit this section otherwise.>
+
 ---
 Sources: [[file1]], [[file2]]
 ```
 
 Overwrite each run. One nudge per run.
 
+Finally, append a run entry to `memory/cog-meta/run-log.md`: `- YYYY-MM-DD /foresight: <one-line outcome>`
+
 ## Rules
 
-1. **Read-only** — foresight NEVER edits memory files. Only writes `foresight-nudge.md`.
+1. **Read-only** — foresight NEVER edits memory files. Only writes `foresight-nudge.md` and its run-log line.
 2. **One nudge** — force prioritization.
 3. **Evidence-based** — cite 2+ source files.
 4. **Non-obvious** — should surprise. If the user already knows, pick something else.

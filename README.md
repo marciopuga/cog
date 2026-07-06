@@ -25,6 +25,8 @@ npx skills add marciopuga/cog-skills
 
 Start your agent and run `/cog` to bootstrap your domains. Your agent now has persistent memory at `~/cog/memory/`.
 
+**Claude Code users:** the clone already ships the skills at `.claude/commands/` (vendored from [cog-skills](https://github.com/marciopuga/cog-skills), the canonical source, under their unprefixed names — `/reflect`, `/housekeeping`, ...). The `npx skills add` step is what installs them for other agents, where they carry a `cog-` prefix (`/cog-reflect`, ...).
+
 **One folder, many projects.** `~/cog` is your agent's single brain — it works across every project and session. Don't scaffold memory inside each project. That fragments your context. One place where everything connects.
 
 ### Custom install location
@@ -68,16 +70,23 @@ The folder works as both an AI memory system and a human knowledge base. No conf
 ~/cog/memory/
 ├── hot-memory.md           ← Always loaded. <50 lines. Current state.
 ├── domains.yml             ← Domain manifest (SSOT)
+├── link-index.md           ← Backlink index (auto-generated)
 ├── personal/               ← Warm. Loaded when relevant.
 │   ├── hot-memory.md
 │   ├── observations.md     ← Append-only event log
 │   ├── action-items.md     ← Tasks
 │   ├── entities.md         ← People, places, things
+│   ├── threads/            ← Synthesis files for recurring topics
 │   └── ...
-├── work/                   ← Your work domains
+├── work/                   ← Your work domains (created by /cog)
 ├── cog-meta/               ← System self-knowledge
 │   ├── patterns.md         ← Distilled rules
-│   └── self-observations.md
+│   ├── self-observations.md
+│   ├── action-items.md     ← System tasks (evolve routes here)
+│   ├── run-log.md          ← Pipeline run log
+│   ├── scenario-calibration.md
+│   ├── foresight-nudge.md
+│   └── scenarios/          ← Active decision simulations
 └── glacier/                ← Cold archive. Indexed.
     └── index.md
 ```
@@ -88,11 +97,13 @@ Schedule pipeline skills with cron. **Run housekeeping → reflect in the same s
 
 ```bash
 # Weekly maintenance pulse
-0 23 * * 0  cd ~/cog && claude -p "/housekeeping then /reflect"
+0 23 * * 0  cd "${COG_HOME:-$HOME/cog}" && claude -p "/housekeeping then /reflect"
 
 # Monthly architecture audit
-0  1 1 * *  cd ~/cog && claude -p "/evolve"
+0  1 1 * *  cd "${COG_HOME:-$HOME/cog}" && claude -p "/evolve"
 ```
+
+(Skill names carry a `cog-` prefix when installed via skills.sh: `/cog-housekeeping then /cog-reflect`.)
 
 The pipeline is optional. Cog works without it — but running it regularly keeps memory clean and surfaces insights you'd miss.
 

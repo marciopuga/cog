@@ -10,7 +10,7 @@ description: >
 
 Systems-level self-improvement. The architect.
 
-**This is NOT /cog-reflect.** Reflect = "what did I learn?" Evolve = "are the rules working?" Evolve never touches memory content — it changes the rules that govern how content moves.
+**This is NOT the reflect skill.** Reflect = "what did I learn?" Evolve = "are the rules working?" Evolve never touches memory content — it changes the rules that govern how content moves.
 
 ## Memory Path
 
@@ -19,7 +19,7 @@ All files under the resolved memory path: `$COG_HOME/memory/` if `COG_HOME` is s
 ## Minimum Data Check
 
 Before auditing, verify the system has enough history:
-- If reflect has never run (no self-observations, no patterns): stop. Say "Nothing to audit yet. Run /cog-reflect a few times first to build patterns, then evolve can assess whether they're working."
+- If reflect has never run (no self-observations, no patterns): stop. Say "Nothing to audit yet. Run the reflect skill a few times first to build patterns, then evolve can assess whether they're working."
 - If patterns.md has < 3 entries: say "Too few patterns to evaluate effectiveness. Let the system run for a few more cycles."
 
 Evolve audits rules — there need to be rules to audit.
@@ -29,6 +29,7 @@ Evolve audits rules — there need to be rules to audit.
 Continuity (read first):
 - `memory/cog-meta/self-observations.md` (what's been noticed)
 - `memory/cog-meta/patterns.md` (current rules)
+- `memory/cog-meta/run-log.md` (when housekeeping/reflect actually last ran)
 
 Measure (don't edit content):
 - `memory/hot-memory.md`
@@ -63,7 +64,7 @@ Review output of recent housekeeping and reflect runs:
 - Satellite pattern files: list each with line count (cap: 30)
 - Entity compression ratio: total entity lines / total entries (target: ≤3.0)
 - Hot-memory line counts vs 50-line cap
-- Domain INDEX.md freshness: last-updated date vs today (target: <7 days)
+- Domain INDEX.md freshness: last-updated date vs today (target: ≤14 days). If INDEX.md files don't exist yet, that's not staleness — route one item: "Run the housekeeping skill to generate domain indexes."
 - Temporal markers: count of expired-but-not-swept markers (target: 0)
 
 ### 3. Auto-Route on Threshold Breach
@@ -77,9 +78,9 @@ This is the critical difference between theatrical evolve (reporting problems) a
 | `patterns.md` line ratio > 1.0 | Exceeds 70 lines | → `cog-meta/action-items.md`: "Merge or replace patterns to bring below 70 lines" |
 | Satellite pattern file > 30 lines | Exceeds soft cap | → domain `action-items.md`: "Compress {domain} patterns" |
 | Entity compression > 3.0 | Entries too verbose | → domain `action-items.md`: "Compress entities or promote to threads" |
-| Hot-memory > 50 lines | Exceeds cap | → `action-items.md`: "Prune hot-memory (run /cog-housekeeping)" |
-| INDEX.md > 14 days stale | Drift risk | → `cog-meta/action-items.md`: "Rebuild domain indexes (run /cog-housekeeping)" |
-| Expired temporal markers > 0 | Stale facts | → `cog-meta/action-items.md`: "Sweep expired temporal markers (run /cog-housekeeping)" |
+| Hot-memory > 50 lines | Exceeds cap | → `action-items.md`: "Prune hot-memory (run the housekeeping skill)" |
+| INDEX.md > 14 days stale | Drift risk | → `cog-meta/action-items.md`: "Rebuild domain indexes (run the housekeeping skill)" |
+| Expired temporal markers > 0 | Stale facts | → `cog-meta/action-items.md`: "Sweep expired temporal markers (run the housekeeping skill)" |
 | Same issue logged 3+ times in self-observations | Recurring unresolved | → Escalate: propose rule change that prevents recurrence |
 
 **Format for auto-routed items:**
@@ -130,3 +131,5 @@ Concise summary:
 - *Architecture notes* — structural observations
 
 Numbers over narrative. If nothing breaches thresholds, say so and stop — don't invent work.
+
+Finally, append a run entry to `memory/cog-meta/run-log.md`: `- YYYY-MM-DD /evolve: <one-line outcome>`

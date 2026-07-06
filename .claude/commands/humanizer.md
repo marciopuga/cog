@@ -1,3 +1,12 @@
+---
+name: humanizer
+description: >
+  De-AI text — remove AI writing artifacts and inject human voice, based on
+  Wikipedia's "Signs of AI writing" guide. Edits existing text only.
+  Invoke with /humanizer. Bundled writing extra — not part of the core
+  memory pipeline.
+---
+
 Use this skill when the user wants to humanize, de-AI, or clean up AI-generated text. Trigger if the conversation involves:
 - "Humanize this", "make this sound human", "de-AI this"
 - "This sounds too AI", "too ChatGPT", "sounds robotic"

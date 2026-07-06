@@ -15,6 +15,6 @@ domains:
     type: system
     label: "Cog self-knowledge, pipeline health, architecture"
     triggers: [cog, meta, evolve, pipeline, memory system, architecture]
-    files: [self-observations, patterns, improvements, scenario-calibration, foresight-nudge]
+    files: [self-observations, patterns, improvements, action-items, run-log, scenario-calibration, foresight-nudge]
 
   # Run /cog to add more domains conversationally.

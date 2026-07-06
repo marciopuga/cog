@@ -1,7 +1,7 @@
 <!-- L0: Prediction accuracy tracker for decision scenarios -->
 # Scenario Calibration
 
-<!-- Updated by /reflect when scenarios resolve. -->
+<!-- Updated by the reflect skill when scenarios resolve. One table row per resolved scenario. -->
 
 ## Resolved Scenarios
 
