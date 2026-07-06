@@ -77,6 +77,7 @@ The folder works as both an AI memory system and a human knowledge base. No conf
 │   ├── action-items.md     ← Tasks
 │   ├── entities.md         ← People, places, things
 │   ├── threads/            ← Synthesis files for recurring topics
+│   ├── INDEX.md            ← Per-domain L0 index (auto-generated)
 │   └── ...
 ├── work/                   ← Your work domains (created by /cog)
 ├── cog-meta/               ← System self-knowledge
@@ -86,10 +87,27 @@ The folder works as both an AI memory system and a human knowledge base. No conf
 │   ├── run-log.md          ← Pipeline run log
 │   ├── scenario-calibration.md
 │   ├── foresight-nudge.md
-│   └── scenarios/          ← Active decision simulations
+│   ├── scenarios/          ← Active decision simulations
+│   └── INDEX.md
 └── glacier/                ← Cold archive. Indexed.
     └── index.md
 ```
+
+## Skills
+
+Installed via `npx skills add marciopuga/cog-skills` (names carry a `cog-` prefix) or bundled with this repo for Claude Code (unprefixed):
+
+| Skill | Purpose |
+|-------|---------|
+| `/cog` | Memory conventions + setup — bootstraps domains and generates a routing skill per domain (e.g. `/personal`) |
+| `/reflect` | Mine interactions, consolidate observations into patterns, resolve scenarios |
+| `/housekeeping` | Archive, prune, rebuild indexes, sweep expired facts |
+| `/evolve` | Audit the architecture, auto-route threshold breaches |
+| `/foresight` | Cross-domain strategic nudge, flags decisions worth simulating |
+| `/history` | Deep memory search — piece together a narrative across files |
+| `/scenario` | Decision simulation — branch a decision into 2-3 modeled paths |
+
+The Claude Code bundle also includes writing extras (`/explainer`, `/humanizer`) and a `/commit` utility.
 
 ## Optional: Automated Maintenance
 
