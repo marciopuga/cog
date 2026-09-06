@@ -132,11 +132,27 @@ Everything is observable. The agent never loads the whole tree — it climbs a l
 memory/hot-memory.md          always          → what's going on
 memory/domains.yml            always          → which folders exist, what wakes them
 memory/{domain}/INDEX.md      domain matched  → which file (L0 + line count, subfolders, threads, glacier pointer)
-## section headers            files >80 lines → which section
-the file                      L2              → the content
+grep -n "^#" file             files >80 lines → which section
+the file, or one section      L2              → the content
 ```
 
+Large subfolders fold into one index row of file names plus their own `INDEX.md`, so a domain index stays one read however many files it grows. A query about your own life with no trigger match defaults to `personal`; a name no L0 mentions is found with one grep inside that domain, never across the tree.
+
 Run `grep -rn "<!-- L0:" ~/cog/memory/` yourself to see every summary the agent can reach. No black box.
+
+## Verified on Real Memory
+
+The conventions were tested against a copy of a real personal memory — 53 files, ~8,600 lines, eight nested subfolders, 23 glacier archives — with headless runs tracing every tool call, then one full weekly pulse.
+
+| What was measured | Result |
+|-------------------|--------|
+| Retrieval queries (overview, person, history, nested folder, glacier, proper noun, off-topic) | 10/10 answered correctly |
+| Memory loaded per query | 5–10k tokens of a ~100k-token corpus; off-topic queries load nothing |
+| Domain index after subfolder support | 39 rows, one read, every file reachable in ≤2 reads |
+| Housekeeping's rebuilt indexes vs a deterministic reference | byte-identical |
+| Weekly pulse (housekeeping → reflect) | hot-memory 59→49 lines, 26 expired markers swept, 22 archive L0s added, 12 patterns seeded, Health table with nothing over cap |
+
+What it found became rules: subfolder-aware indexes, default-to-personal, the one sanctioned grep, headers-before-cat, L0 after frontmatter. The remaining risk is model discipline on files over 80 lines — text rules steer, they don't enforce — which is why the pipeline keeps files small and splits recurring topics into threads.
 
 ## Credits
 
