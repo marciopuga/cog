@@ -1,16 +1,19 @@
 ---
 name: foresight
 description: >
-  Cross-domain strategic scan. Detects convergence between life areas,
-  velocity changes, and upcoming timing windows. Writes one actionable
-  nudge per run. Invoke with /foresight.
+  Cross-domain strategic scan, on demand. Detects convergence between life
+  areas, velocity changes, and upcoming timing windows. Writes one actionable
+  nudge per run. Invoke with /foresight or on "what should I be thinking
+  about" / "where is this heading" questions.
 ---
 
 # Cog Foresight
 
 Strategic foresight — connecting dots across domains. Future-facing.
 
-**This is NOT reflect** (past-facing) or **evolve** (system architecture). Foresight scans broadly and projects trajectories.
+**This is NOT reflect** (past-facing). Foresight scans broadly and projects trajectories.
+
+**Run on demand, not on a schedule.** A nudge nobody asked for is noise; a nudge in answer to "what should I be thinking about?" is the point. The nudge is delivered in the conversation — the file is the record, and it surfaces again through the retrieval protocol's Overview query type while it's fresh.
 
 ## Memory Path
 
@@ -112,7 +115,7 @@ Finally, append a run entry to `memory/cog-meta/run-log.md`: `- YYYY-MM-DD /fore
 
 ## Anti-Patterns
 
-- Don't repeat what housekeeping already flagged (stale items, birthdays)
+- Don't repeat what housekeeping already listed as facts (stale items, dormant domains) — use them as inputs, not output
 - Don't recommend "reflect on X" — be specific about what to DO
 - Don't flag explicitly deferred items
 - Don't flag things that are cruising

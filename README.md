@@ -77,16 +77,15 @@ The folder works as both an AI memory system and a human knowledge base. No conf
 │   ├── action-items.md     ← Tasks
 │   ├── entities.md         ← People, places, things
 │   ├── threads/            ← Synthesis files for recurring topics
-│   ├── INDEX.md            ← Per-domain L0 index (auto-generated)
+│   ├── INDEX.md            ← Domain L0 index: file, line count, summary; subfolders inline or folded (auto-generated)
 │   └── ...
 ├── work/                   ← Your work domains (created by /cog)
 ├── cog-meta/               ← System self-knowledge
 │   ├── patterns.md         ← Distilled rules
 │   ├── self-observations.md
-│   ├── action-items.md     ← System tasks (evolve routes here)
+│   ├── action-items.md     ← System tasks (over-cap metrics, ideas)
 │   ├── run-log.md          ← Pipeline run log
-│   ├── scenario-calibration.md
-│   ├── foresight-nudge.md
+│   ├── foresight-nudge.md  ← Latest on-demand nudge
 │   ├── scenarios/          ← Active decision simulations
 │   └── INDEX.md
 └── glacier/                ← Cold archive. Indexed.
@@ -99,27 +98,25 @@ Installed via `npx skills add marciopuga/cog-skills` (names carry a `cog-` prefi
 
 | Skill | Purpose |
 |-------|---------|
-| `/cog` | Memory conventions + setup — bootstraps domains and generates a routing skill per domain (e.g. `/personal`) |
-| `/reflect` | Mine interactions, consolidate observations into patterns, resolve scenarios |
-| `/housekeeping` | Archive, prune, rebuild indexes, sweep expired facts |
-| `/evolve` | Audit the architecture, auto-route threshold breaches |
-| `/foresight` | Cross-domain strategic nudge, flags decisions worth simulating |
-| `/history` | Deep memory search — piece together a narrative across files |
-| `/scenario` | Decision simulation — branch a decision into 2-3 modeled paths |
+| `/cog` | Memory conventions + setup — bootstraps domains, folders, and their indexes (no per-domain skills; routing is `domains.yml` → `INDEX.md`) |
+| `/housekeeping` | Weekly, automated — archive, prune, rebuild indexes, sweep expired facts, report a Health table |
+| `/reflect` | Weekly, automated (same session) — consolidate observations into patterns, fix contradictions, raise threads, close scenarios |
+| `/foresight` | On demand — one cross-domain strategic nudge, flags decisions worth simulating |
+| `/scenario` | On demand — branch a decision into 2-3 modeled paths |
+| `/history` | On demand — deep memory search, piece together a narrative across files |
 
 The Claude Code bundle also includes writing extras (`/explainer`, `/humanizer`) and a `/commit` utility.
 
 ## Optional: Automated Maintenance
 
-Schedule pipeline skills with cron. **Run housekeeping → reflect in the same session** so reflect sees freshly-pruned state:
+One scheduled pulse. **Run housekeeping → reflect in the same session** so reflect sees freshly-pruned state:
 
 ```bash
 # Weekly maintenance pulse
 0 23 * * 0  cd "${COG_HOME:-$HOME/cog}" && claude -p "/housekeeping then /reflect"
-
-# Monthly architecture audit
-0  1 1 * *  cd "${COG_HOME:-$HOME/cog}" && claude -p "/evolve"
 ```
+
+Foresight, scenario, and history run when you ask for them. Housekeeping's Health table is the system audit.
 
 (Skill names carry a `cog-` prefix when installed via skills.sh: `/cog-housekeeping then /cog-reflect`.)
 
@@ -129,7 +126,17 @@ The pipeline is optional. Cog works without it — but running it regularly keep
 
 `npx skills add` installs SKILL.md files that teach your agent the conventions: how to tier memory, when to consolidate, how to route queries, where to write facts. The `memory/` directory is the state that emerges from following these rules over time.
 
-Everything is observable — run `grep -rn "<!-- L0:" ~/cog/memory/` and you see exactly what your agent sees. No black box.
+Everything is observable. The agent never loads the whole tree — it climbs a ladder of small reads, each one saying what to open next:
+
+```
+memory/hot-memory.md          always          → what's going on
+memory/domains.yml            always          → which folders exist, what wakes them
+memory/{domain}/INDEX.md      domain matched  → which file (L0 + line count, subfolders, threads, glacier pointer)
+## section headers            files >80 lines → which section
+the file                      L2              → the content
+```
+
+Run `grep -rn "<!-- L0:" ~/cog/memory/` yourself to see every summary the agent can reach. No black box.
 
 ## Credits
 

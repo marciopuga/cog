@@ -33,7 +33,8 @@ Search across:
 ### Pass 1: Locate
 
 - Extract keywords from the user's query (names, topics, dates, phrases)
-- Grep the resolved memory root for each keyword
+- If the query names a domain (or `memory/domains.yml` triggers match), grep inside that domain first; fall back to the whole memory root only when the domain is unknown
+- Grep for each keyword
 - Note which files matched and how many hits
 - If >10 files match, narrow by domain or add query terms
 - If 0 matches, try synonyms or related terms

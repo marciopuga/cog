@@ -1,15 +1,16 @@
 ---
 name: reflect
 description: >
-  Mine recent interactions for patterns and consolidate memory.
-  Detects contradictions, promotes observations to patterns, triages hot-memory,
-  and suggests thread candidates. Run weekly or nightly for best results.
+  Mine recent observations for patterns and consolidate memory.
+  Detects contradictions, promotes observations to patterns, promotes
+  heating topics to hot-memory, and suggests thread candidates. Run weekly,
+  in the same session as housekeeping.
   Invoke with /reflect.
 ---
 
 # Cog Reflect
 
-Self-reflection and memory consolidation. Past-facing — mines interactions, fixes contradictions, distills patterns.
+Self-reflection and memory consolidation. Past-facing — reads memory, fixes contradictions, distills patterns. Reflect never sees transcripts: everything it knows comes from what was written to memory, so an interaction that was never captured is invisible here.
 
 **Take your time.** This is a deep session. Read broadly, cross-reference, and ACT on findings. You're the maintainer of the knowledge base.
 
@@ -22,7 +23,7 @@ All files under the resolved memory path: `$COG_HOME/memory/` if `COG_HOME` is s
 Scope your work before reading files:
 
 1. Find files changed since the last run — read `memory/cog-meta/run-log.md` for the last `/reflect` entry and scope to files modified since that date (no entry → default to the last 7 days)
-2. Get L0 summaries across all domains (quick routing)
+2. Read `memory/domains.yml`, then `INDEX.md` only for domains that have changed files — the index gives L0 + line counts per file. Don't grep L0 headers across the whole tree. Never edit an `INDEX.md` — housekeeping regenerates them; a week of drift in line counts is harmless.
 3. Check observation entry counts (archival threshold = 50)
 
 Focus on recently-changed files. Skip unchanged ones.
@@ -40,7 +41,7 @@ Don't produce low-quality output from insufficient data. It's better to say "not
 
 - `memory/cog-meta/self-observations.md`
 - `memory/cog-meta/patterns.md`
-- `memory/cog-meta/improvements.md`
+- `memory/cog-meta/action-items.md` (open `[housekeeping]` routes and `pri:low` ideas)
 - `memory/cog-meta/scenarios/*.md` (active scenarios, for the retrospective step)
 - All domain `observations.md` files
 - All domain `action-items.md` files
@@ -48,15 +49,14 @@ Don't produce low-quality output from insufficient data. It's better to say "not
 
 ## Process
 
-### 1. Review Recent Interactions
+### 1. Review Recent Observations
 
-Look for:
-- **Unresolved threads** — questions asked but never answered
-- **Broken promises** — "I'll do X" that never happened
-- **Repeated friction** — same question asked multiple ways, user corrections
-- **Missed cues** — things the user had to repeat
-- **Memory gaps** — information discussed but never saved
-- **Feature ideas** — improvements that came up organically
+Derived from observations, action items, and hot-memory — not from conversation:
+- **Unresolved** — open action items with no observation touching them since they were added
+- **Broken promises** — "will do X" in observations that never became an item or was never checked off
+- **Repeated friction** — the same correction or clarification logged more than once
+- **Memory gaps** — people, places, or facts referenced in observations that have no entity or canonical entry
+- **System ideas** — improvements to Cog itself that came up organically → `cog-meta/action-items.md` as `pri:low`
 
 ### 2. Consistency Sweep
 
@@ -109,15 +109,12 @@ Clusters with ≥5 entries in <7 days don't meet the 7-day span requirement. But
 - These are thread-raising candidates (see Step 5)
 
 **Hot-memory relevance:**
-- **Promote**: Pattern heating up → add to hot-memory
-- **Demote**: Item gone quiet (no references 2+ weeks) → remove from hot-memory
+- **Promote**: Pattern heating up → add to hot-memory (pointer only — the fact stays in its canonical file)
+- Demotion is housekeeping's job (it prunes entries unreferenced 14+ days). Don't do it here.
 
-### 4. Entity Format Enforcement
+### 4. Cross-Domain Entity Check
 
-Scan all `entities.md` files:
-1. **3-line check**: Entries >3 lines → compress or flag for thread promotion
-2. **Status/last fields**: Every entry needs `status:` and `last:` fields
-3. **Cross-domain pointers**: Same person in multiple files → one canonical, others `see [[link]]`
+Same person or place in more than one `entities.md` → pick the canonical file, replace the others with `see [[domain/entities#Name]]`. Line limits and `status:`/`last:` fields are housekeeping's job — leave them.
 
 ### 5. Thread Candidate Detection
 
@@ -131,10 +128,10 @@ Scan observations for topics appearing across 3+ dates or spanning 2+ weeks:
 Check `memory/cog-meta/scenarios/` for active scenarios (skip if the directory is empty):
 
 1. **Past check-by date** → compare each branch against what actually happened (observations, action items, calendar). Note which branch reality is tracking and whether any canary signals fired.
-2. **Decision made / resolution reached** → set frontmatter `status: resolved`, write the `## Retrospective` section (which branch played out, what the scenario got right/wrong), and add a row to the Resolved Scenarios table in `memory/cog-meta/scenario-calibration.md` (scenario, created, resolved, predicted branch, actual branch, accuracy, lesson) — then update its Metrics section.
+2. **Decision made / resolution reached** → set frontmatter `status: resolved` and write the `## Retrospective` section: which branch played out, what the scenario got right and wrong, one lesson. If the lesson is timeless, it's a pattern candidate for Gate 2.
 3. **Still open and within window** → leave untouched.
 
-This is the feedback loop that keeps scenario confidence calibrated.
+This closes the loop: every scenario ends with what actually happened, in the scenario file itself.
 
 ### 7. Act on Findings
 
@@ -142,6 +139,8 @@ This is the feedback loop that keeps scenario confidence calibrated.
 - New self-observations → append to `cog-meta/self-observations.md` (max 5 per run)
 - Pattern updates → edit `cog-meta/patterns.md`
 - Memory gaps → write to appropriate domain files
+
+**Escalate recurring issues:** before writing a self-observation, grep `self-observations.md` for the same tag. If the same problem is already logged 3+ times (or housekeeping has routed the same `[housekeeping]` item 3 runs running), don't log it again — fix what lets it recur: edit the pattern in `patterns.md` that should have prevented it, or write one concrete `[ ]` item in `cog-meta/action-items.md` naming the file and the change. Observing a problem for the third time is a rule failure, not an observation.
 
 **Connect:**
 - Scattered information → add `[[links]]`
@@ -164,4 +163,4 @@ Finally, append a run entry to `memory/cog-meta/run-log.md`: `- YYYY-MM-DD /refl
 
 - **Self-observation**: `- YYYY-MM-DD [tag]: <observation>`
 - **Pattern**: Edit existing section or add new bullet
-- **Improvement**: `- <idea> (added YYYY-MM-DD)`
+- **System idea**: `- [ ] idea | pri:low | added:YYYY-MM-DD` in `cog-meta/action-items.md`

@@ -35,7 +35,7 @@ Don't run a full pipeline over an empty system. Acknowledge and exit early.
 
 ### 1. Garbage Collect
 
-Archive stale data per glacier rules. All glacier files need YAML frontmatter.
+Archive stale data per glacier rules. All glacier files need YAML frontmatter followed by an `<!-- L0: ... -->` line (the L0 sits right after the closing `---`, not on line 1).
 
 **Observations — archive by primary tag:**
 - Any `observations.md` >50 entries → group oldest by primary tag → `glacier/{domain}/observations-{tag}.md`
@@ -60,13 +60,12 @@ Keep ALL `hot-memory.md` files under 50 lines.
 - Purely historical → let them go
 - Never silently delete — move or note in debrief
 
-### 3. Surface Opportunities
+### 3. Surface Facts
 
-Review all `action-items.md` across every domain:
-- **Stale items** (open >2 weeks): list with age and suggested action
-- **Dormant domains** (0 observations in >4 weeks): flag
-- **Health escalation** (open >6 months): flag with urgency
-- **Birthday prep** (<2 weeks away): pull interests, suggest ideas
+List, don't advise — suggestions are foresight's lane. Across every domain's `action-items.md` and `observations.md`:
+- **Stale items** (open >2 weeks): item + age. Skip items carrying `<!-- muted: reason -->` — the user asked not to be reminded; the marker wins over the due date.
+- **Dormant domains** (0 observations in >4 weeks): domain + last entry date
+- **Long-open items** (open >6 months): item + age
 
 ### 4. Temporal Validity Sweep
 
@@ -76,17 +75,25 @@ Scan ALL memory files (hot-memory, action-items, entities, threads) for `<!-- un
 2. **If expired**: remove the line from its current file
    - If the line has lasting value → append to `observations.md` with `[archived]` tag
    - If purely temporal (event countdown, temporary state) → discard
+   - **Exception — dated log rows**: in append-only sections (`observations.md`, `## History`, `## Timeline`, dated insight rows) strip the marker and keep the line. The date already scopes a log entry; deleting it guts the record.
 3. **If expiring within 7 days**: leave in place but add to debrief as "expiring soon"
 
 This is deterministic — no judgment needed. Date math only.
 
 **Do NOT touch `<!-- from:YYYY-MM-DD -->` markers** — those are stable-since markers and never expire.
 
-### 5. Rebuild Indexes (Deterministic)
+### 5. L0 Header Maintenance
+
+Runs before the index rebuild so no index is ever written against a missing header. Check every `.md` file under `memory/` — all subfolders, `threads/`, `scenarios/`, and glacier archives — for an `<!-- L0: ... -->` line: line 1 for plain markdown, first line after the closing `---` for files with YAML frontmatter. Detect with `grep -m1 -n "<!-- L0:"`, not `head -1` — frontmatter can run to hundreds of lines. Add where missing:
+- Glacier archives: derive the L0 from the frontmatter `summary:` (first 80 chars). Don't read the body.
+- Everything else: read the file, write a one-line summary (max 80 chars).
+- Place it in the header position above.
+
+### 6. Rebuild Indexes (Deterministic)
 
 Rebuild ALL indexes from source of truth — no LLM judgment, pure data extraction.
 
-**5a. Glacier Index**
+**6a. Glacier Index**
 
 Scan `memory/glacier/**/*.md`, extract YAML frontmatter, write `memory/glacier/index.md`:
 
@@ -100,9 +107,9 @@ Scan `memory/glacier/**/*.md`, extract YAML frontmatter, write `memory/glacier/i
 |------|--------|------|------|------------|---------|---------|
 ```
 
-**5b. Domain INDEX.md files**
+**6b. Domain INDEX.md files**
 
-For each domain directory, read every `.md` file's `<!-- L0: ... -->` header and write `memory/{domain}/INDEX.md`:
+For each domain in `domains.yml`, walk `memory/{path}/` recursively, read each file's `<!-- L0: ... -->` header (`grep -m1`) and line count (`wc -l`), and write `memory/{path}/INDEX.md`:
 
 ```markdown
 <!-- L0: L0 index of {domain} files -->
@@ -110,31 +117,47 @@ For each domain directory, read every `.md` file's `<!-- L0: ... -->` header and
 <!-- Auto-generated from L0 headers. Do not edit. -->
 <!-- Last updated: YYYY-MM-DD -->
 
-| File | Summary |
-|------|---------|
-| hot-memory.md | Current state and priorities |
-| observations.md | Timestamped events and learnings |
+| File | Lines | Summary |
+|------|-------|---------|
+| hot-memory.md | 12 | Current state and priorities |
+| observations.md | 143 | Timestamped events and learnings |
+| threads/hydrotap-repair.md | 61 | HydroTap chiller saga — current state and timeline |
+| scenarios/ | — | (no scenarios yet) |
+| people/dad.md | 622 | Dad — health arc, TAVI, the Brazil relay |
+| people/susan.md | 105 | Susan — how they met, marriage arc, partnership dynamics |
+| career/ | 8 files | creative-lab-2026-interview, creative-technologist, ct-axioms, google-creative-lab, loducca, portfolio, … |
+| glacier/personal/ | 2 archives | Archived data — read glacier/index.md when the query is historical |
 ```
 
-**Key principle**: These indexes are DETERMINISTIC — computed from L0 headers that already exist. If a file has no L0 header, list it with summary "(no L0 header — needs one)". Never invent summaries; just reflect what's there.
+Rules:
+- Exclude `INDEX.md` files. Row order: top-level files in `domains.yml` `files:` order (extras after, by name); then `threads/` and `scenarios/`; then other subfolders by name; glacier row last.
+- **Small subfolder (≤5 `.md` files): list its files inline** as `| people/dad.md | 622 | … |`. No index inside it.
+- **Large subfolder (>5 files): one folder row** — `| career/ | 8 files | <file stems, by name, cut at ~100 chars with …> |` — **and its own `INDEX.md`** inside that folder, same format, paths relative to that folder, L0 `<!-- L0: L0 index of {domain}/{folder} files -->`. The stems usually let the agent open the right file directly; the sub-index is the fallback when they don't.
+- `threads/` and `scenarios/` are always inline whatever their size — they are the synthesis layer, their L0s are the point. An empty one gets `| threads/ | — | (no threads yet) |`.
+- Apply the same rules recursively inside a large subfolder (a nested folder is inline or folded by the same count).
+- Add the glacier row only when `memory/glacier/{path}/` has files; count them. This is the only glacier exposure the domain gets — the agent learns archives exist without loading the catalog.
+- `Lines` = `wc -l`. It makes the L1-before-L2 rule (>80 lines) decidable from the index, so the agent never opens a file just to learn its size.
+- The point of the fold: a domain index stays one small read (~20–40 rows) no matter how many files the domain grows. Nothing under a domain is unreachable from its index in at most two reads.
+
+**Key principle**: These indexes are DETERMINISTIC — computed from L0 headers that already exist. If a file still has no L0 header, list it with summary "(no L0 header — needs one)". Never invent summaries; just reflect what's there.
 
 This prevents index drift — the failure mode where LLM-generated indexes silently go stale because the generation step was skipped or failed.
 
-### 6. Link Audit
+### 7. Link Audit
 
 For each non-glacier memory file:
-1. Entity mentions matching `### Name` headers → add `[[links]]` if missing
+1. Entity mentions matching `### Name` headers → add `[[links]]` if missing. Append-only files (`observations.md`, self-observations) allow exactly one edit to a past entry: a trailing `[[link]]`. The entry text itself is never rewritten.
 2. Cross-domain references → add cross-domain links
 3. Action item references → link observations to tasks
 
-### 7. Entity Format Enforcement
+### 8. Entity Format Enforcement
 
 Scan all `entities.md`:
 1. **3-line max**: Entries >3 lines → compress or flag for thread promotion
 2. **Glacier candidates**: Inactive >6 months → move to glacier (leave stub)
 3. **Missing metadata**: Flag entries without `status:` or `last:` fields
 
-### 8. Rebuild Link Index
+### 9. Rebuild Link Index
 
 Scan all memory files (exclude glacier) for `[[wiki-links]]`. Write `memory/link-index.md`:
 
@@ -149,20 +172,25 @@ Scan all memory files (exclude glacier) for `[[wiki-links]]`. Write `memory/link
 |--------|-------------|
 ```
 
-### 9. L0 Header Maintenance
-
-Check all files for missing `<!-- L0: ... -->` headers. Add where missing:
-- Read file content
-- Write one-line summary (max 80 chars)
-- Place as first line
-
 ### 10. Debrief
 
 Summarize:
 - What was archived/pruned
-- Upcoming events flagged
-- Action items surfaced
+- Facts surfaced (step 3)
 - Links added
 - Files modified (list each one)
+
+Then a **Health** table — numbers only, computed from the files you just touched. Every row has a mechanical owner, and this run either applied the fix or routed it:
+
+| Metric | Value | Cap | Owner |
+|--------|-------|-----|-------|
+| Root hot-memory lines | 31 | 50 | step 2 |
+| `cog-meta/patterns.md` lines | 58 | 70 | reflect |
+| Satellite patterns lines (per file) | … | 30 | reflect |
+| Entity lines ÷ entries | 2.6 | 3.0 | step 8 |
+| Expired temporal markers | 0 | 0 | step 4 |
+| Domain index age (days) | 0 | 14 | step 6 |
+
+Over cap and not yours to fix → append `- [ ] [housekeeping] {what} | due:YYYY-MM-DD | pri:med | added:YYYY-MM-DD` to `memory/cog-meta/action-items.md`. If an item for the same metric already exists, update it — don't duplicate. Same issue routed 3 runs in a row → say so in the debrief; that's a rule problem for reflect, not a task.
 
 Finally, append a run entry to `memory/cog-meta/run-log.md`: `- YYYY-MM-DD /housekeeping: <one-line outcome>`. While there, trim run-log entries older than 90 days.

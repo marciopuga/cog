@@ -1,8 +1,8 @@
-<!-- L0: System maintenance tasks — evolve routes threshold breaches here -->
+<!-- L0: System tasks — housekeeping routes over-cap metrics, reflect routes ideas -->
 # Cog — Action Items
 
 <!-- Format: - [ ] task | due:YYYY-MM-DD | pri:high/med/low | added:YYYY-MM-DD -->
-<!-- Items tagged [evolve] are auto-routed by the evolve skill. -->
+<!-- [housekeeping] = routed over-cap metric. pri:low = system idea from reflect. -->
 
 ## Open
 
