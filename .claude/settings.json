@@ -6,26 +6,12 @@
       "Write",
       "Glob",
       "Grep",
-      "Bash(bin/cog *)",
-      "Bash(python3 bin/cog *)",
       "Bash(grep *)",
       "Bash(sed -n *)",
       "Bash(wc *)",
       "Bash(ls *)",
       "Bash(mkdir *)",
       "Bash(date *)"
-    ]
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${COG_HOME:-$CLAUDE_PROJECT_DIR}/bin/cog\" tidy --quiet"
-          }
-        ]
-      }
     ]
   }
 }

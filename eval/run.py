@@ -4,7 +4,7 @@
   old  the layout and instructions of Cog before v2 (CLAUDE.md + /cog skill from git ref OLD_REF,
        <!-- L0 --> comments, domains.yml, per-folder hot-memory.md and INDEX.md, threads/,
        calendar.md, facts kept as History lines in the files they came from, link-index.md)
-  v2   this repo: AGENTS.md, bin/cog, the SessionStart hook, the fixture as it is
+  v2   this repo: AGENTS.md and its commands (prompt only), the fixture as it is
 
 Each question runs in a fresh headless Claude Code session. Grading is by keywords from the
 answer key (eval/questions.json); read eval/results-*.jsonl to check them by eye.
@@ -109,7 +109,7 @@ def build_old(dst):
 
 
 def build_v2(dst):
-    for p in ("AGENTS.md", "CLAUDE.md", ".claude", "bin"):
+    for p in ("AGENTS.md", "CLAUDE.md", ".claude"):
         (shutil.copytree if os.path.isdir(os.path.join(REPO, p)) else shutil.copy)(os.path.join(REPO, p), os.path.join(dst, p))
     shutil.copytree(FIXTURE, os.path.join(dst, "memory"))
 
@@ -119,7 +119,7 @@ def ask(cwd, q, model):
            "--max-turns", "20", "--setting-sources", "project", "--strict-mcp-config", "--no-session-persistence",
            "--permission-mode", "bypassPermissions", "--disallowedTools", "Edit", "Write", "NotebookEdit", "Task", "Agent", "WebSearch", "WebFetch"]
     env = {k: v for k, v in os.environ.items() if not k.startswith(("CLAUDECODE", "CLAUDE_CODE_"))}  # not a nested session
-    env.update(COG_HOME=cwd, COG_TODAY=TODAY)
+    env.update(COG_HOME=cwd)
     out = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, env=env, timeout=600).stdout
     events = [json.loads(s) for s in out.splitlines() if s.startswith("{")]
     tools = [b for e in events if e.get("type") == "assistant" for b in e["message"]["content"] if b.get("type") == "tool_use"]
