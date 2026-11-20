@@ -10,10 +10,10 @@ One memory for every agent and project: a folder of plain-text files and one sho
 git clone https://github.com/marciopuga/cog ~/cog
 cd ~/cog
 claude            # or any agent that reads AGENTS.md
-> /cog            # a few questions, then it creates your folders
+> /cog            # first run: a few questions, then it creates your folders
 ```
 
-From then on, ask about your life and work as you normally would. The agent reads memory before it answers and writes new facts as it learns them. Run `/save` at the end of a session to catch anything it missed.
+From then on, ask about your life and work as you normally would. The agent reads memory before it answers and writes new facts as it learns them. Run `/cog` at the end of a session to catch anything it missed.
 
 If you cloned somewhere else, set `COG_HOME` (for example `export COG_HOME=~/projects/cog`).
 
@@ -21,7 +21,7 @@ If you cloned somewhere else, set `COG_HOME` (for example `export COG_HOME=~/pro
 
 Memory lives in one place, `~/cog/memory/`. Keep it there and don't scaffold memory inside each project.
 
-- **Claude Code, everywhere:** add `@~/cog/AGENTS.md` to `~/.claude/CLAUDE.md`, and copy `.claude/commands/save.md` to `~/.claude/commands/`.
+- **Claude Code, everywhere:** add `@~/cog/AGENTS.md` to `~/.claude/CLAUDE.md`, and copy `.claude/commands/cog.md` to `~/.claude/commands/`.
 - **Codex, Cursor, Gemini CLI and others:** point the agent's own instruction file at `~/cog/AGENTS.md`, or install the skill with `npx skills add marciopuga/cog-skills`.
 
 ## How it works
@@ -97,12 +97,12 @@ There's no cleanup job. The agent keeps files within their limits whenever it wr
 - **Action items:** once more than 10 are ticked, they move to `glacier/action-items-done.md`.
 - **Expired lines:** a line in `hot-memory.md` or `action-items.md` whose `until:` date has passed is ignored when read and moved to `glacier/expired.md` at the next edit.
 
-**`/save`** is the one routine. Run it at the end of a session.
+**`/cog`** is the only command. Run it at the end of a session.
 - It writes what the conversation added: a dated observation, a changed fact, a new event, an action item.
 - It updates hot memory only where a fact changed, and does the upkeep above.
 - It proposes a topic file when one subject has come up three times.
 
-**`/cog`** sets up folders from a few questions, and converts a Cog v1 folder when it finds one.
+On first run it sets up folders from a few questions instead, and when it finds a Cog v1 folder it offers to convert it.
 
 ## Try it on the example
 
@@ -145,7 +145,7 @@ The rule behind the cut: a routine has to change files. One that writes a report
 - **Backlink index:** searching for `[[folder/file` gives backlinks on demand.
 - **Generated indexes:** the `l0:` lines are the index, read with one search.
 - **Self-observations, run logs, foresight, scenarios:** you can just ask the agent. When the same correction comes up twice, write it in `patterns.md`.
-- **Automated pattern promotion and weekly reflection:** `/save` works from the conversation, which is where new facts actually come from.
+- **Automated pattern promotion and weekly reflection:** `/cog` works from the conversation, which is where new facts actually come from.
 - **Domain manifest and keyword triggers:** an agent reading one-line summaries routes just as well.
 - **Per-folder hot memory, rich frontmatter, `last_updated`:** one hot memory is enough, and a file's modification time doesn't go stale.
 - **`from:`, `grace:` and `muted:` markers:** `from:` lives in `facts.md`, and instead of `grace:` you set a later `until:`.

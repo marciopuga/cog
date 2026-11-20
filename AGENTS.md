@@ -6,17 +6,19 @@ You have a persistent memory: one folder of plain-text files, shared by every ag
 
 Memory is `$COG_HOME/memory/` if `COG_HOME` is set, else `~/cog/memory/`. Never create memory anywhere else. Paths below are relative to `memory/`.
 
+Use whatever tools you have for reading, searching and editing files: a built-in file search, `rg`, `grep`, PowerShell's `Select-String`, or your editor's find. Nothing has to be installed. Search patterns below are regular expressions, and any tool that matches lines will do.
+
 ## Read at the start of every session
 
 1. `hot-memory.md`: what is going on now.
 2. `patterns.md`: how the person wants you to work.
-3. The map: search the memory for lines starting `l0:`, skipping `glacier/` (`grep -r '^l0:' --include='*.md' --exclude-dir=glacier ~/cog/memory`). That's one line per file, giving its path and a one-line summary.
+3. The map: search all `.md` files under `memory/`, except `glacier/`, for lines matching `^l0:`. That's one line per file, giving its path and a one-line summary.
 
 These three are small, and together they tell you which file to open next.
 
 ## Find
 
-- Pick at most two folders from the map, then the file whose summary fits. Over 80 lines: list its headings (`grep -n '^#'`) and read only the section you need.
+- Pick at most two folders from the map, then the file whose summary fits. Over 80 lines: find its headings (lines matching `^#`) and read only the section you need.
 - People: the folder's `entities.md`. Tasks and deadlines: its `action-items.md`. A subject's current state: its topic file (`## Current State`).
 - A name or word that no summary mentions: search for it inside the likely folder, not across the whole tree.
 - History: the folder's `observations.md`, then its `glacier/`.
@@ -77,11 +79,11 @@ Rules:
 
 ## Keep it small
 
-Do this whenever you write to one of these files. There is no separate cleanup step.
+Do this whenever you write to one of these files, and whenever you read one that is over its limit. There is no separate cleanup step.
 
 - `observations.md` past 50 entries: move the oldest until 40 remain into `<folder>/glacier/observations-<year>.md`, by each line's year. Append them to the glacier file first, then remove them from the source.
 - More than 10 ticked items in `action-items.md`: move the ticked ones to `<folder>/glacier/action-items-done.md`.
 - A line in `hot-memory.md` or `action-items.md` whose `until:` date has passed: ignore it when reading. Move it to `expired.md` in the `glacier/` beside that file the next time you edit it.
 - A glacier file you create gets an `l0:` line too, such as "Personal observations from 2025".
 
-`/save` at the end of a session writes down what the conversation added and does this upkeep.
+`/cog` at the end of a session writes down what the conversation added and does this upkeep.

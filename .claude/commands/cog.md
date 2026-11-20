@@ -1,23 +1,42 @@
 ---
-description: Set up Cog memory, folders for the areas of your life and work
+description: Cog memory. Saves what this conversation added; sets memory up on first run
 ---
-# /cog: set up memory
+# /cog
 
-1. Find memory (`$COG_HOME/memory`, else `~/cog/memory`). If it's missing, tell the person to clone Cog to `~/cog` (or set `COG_HOME`) and stop.
-2. If memory comes from an older Cog (`domains.yml`, `cog-meta/`, `<!-- L0: -->` comments), offer to convert it first, then convert only after a yes:
-   - `<!-- L0: text -->` becomes frontmatter `l0: text`;
-   - `calendar.md` lines become `events.md` lines, and `cog-meta/patterns.md` becomes `patterns.md`;
-   - `domains.yml`, `link-index.md`, `INDEX.md` files and the rest of `cog-meta/` move to `glacier/legacy/`.
-3. Read `hot-memory.md` and the `l0:` map. If memory already holds content, ask what to add or change instead of starting over.
-4. Ask in one message, at most three questions:
+Follow `AGENTS.md`: the right file, its line format, absolute dates. Memory is `$COG_HOME/memory`, else `~/cog/memory`. If it's missing, tell the person to clone Cog to `~/cog` (or set `COG_HOME`) and stop.
+
+Read `hot-memory.md` and the `l0:` map if you haven't this session, then pick one path.
+
+## Older Cog folder (`domains.yml`, `cog-meta/`, `<!-- L0: -->` comments)
+
+Offer to convert it, and convert only after a yes:
+- `<!-- L0: text -->` becomes frontmatter `l0: text`;
+- `calendar.md` lines become `events.md` lines, and `cog-meta/patterns.md` becomes `patterns.md`;
+- `domains.yml`, `link-index.md`, the `INDEX.md` files and the rest of `cog-meta/` move to `glacier/legacy/`.
+
+Then continue with Save.
+
+## First run (`hot-memory.md` has no entries yet)
+
+1. Ask in one message, at most three questions:
    - What do you do for work, and where?
    - Any side projects, studies or other areas you want me to keep track of?
    - What should I always know about you: name, who you live with, where?
-5. For each area, create a folder (lower case, hyphens, e.g. `work/`, `studio/`). Keep it to 2-4 folders; `personal/` already exists. In each one create `observations.md`, `action-items.md` and `entities.md`, copying the frontmatter and format comment from the files in `personal/` and adjusting the `l0:`.
-6. Write what you learned:
-   - `hot-memory.md`: a **Who** line, then one line per active area;
-   - `entities.md`: the people named;
-   - `facts.md`: values that will change (role, employer, city), with `from:` dates when known;
-   - `events.md`: any dates mentioned that people will refer back to.
-7. Show the `l0:` map of what now exists.
-8. Tell the person the two habits that matter: ask questions about their life normally, and run `/save` at the end of a session.
+2. Create a folder for each area (lower case, hyphens, e.g. `work/`, `studio/`), 2-4 in all; `personal/` already exists. In each one create `observations.md`, `action-items.md` and `entities.md`, copying the frontmatter and format comment from `personal/` and adjusting the `l0:`.
+3. Write what you learned: a **Who** line and one line per area in `hot-memory.md`, people in `entities.md`, changeable values (role, employer, city) in `facts.md`, and dates people will refer back to in `events.md`.
+4. Show the `l0:` map. Tell the person: ask about your life normally, and run `/cog` at the end of a session.
+
+## Save (every other time)
+
+1. Go through the conversation. For each thing that happened or was decided, search the owning folder first. If it's missing, append one dated line to that folder's `observations.md` (with `about:DATE` when it happened on another day).
+2. Changes:
+   - a value changed: close the old line in `facts.md` (`until:`), then append the new one;
+   - a new date people will refer back to: a line in `events.md`, with `aka:` names;
+   - an open ask or promise: `action-items.md`; something finished: tick it and add `done:`;
+   - a new person: `entities.md`;
+   - a topic file whose state moved: rewrite its `## Current State`, then append to `## Timeline`.
+3. Rewrite `hot-memory.md` lines only where a fact changed. Remove lines that are done, and move lines whose `until:` date has passed to `glacier/expired.md`. At most 25 lines.
+4. Keep every file you touched within its limits ("Keep it small" in `AGENTS.md`).
+5. If one subject now has 3 or more observations and no topic file, propose one (file name and `l0:`). Create it only after a yes.
+6. If the person corrected you on the same thing twice, propose a line for `patterns.md`.
+7. Reply with what you wrote, one line per file, including anything archived. If nothing was new, write nothing and say so.
