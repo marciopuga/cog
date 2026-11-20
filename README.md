@@ -2,7 +2,7 @@
 
 One memory for every agent and project: a folder of plain-text files and one short instruction file. There's nothing to install, and no server, database, embeddings or scripts: just markdown and the file tools your agent already has.
 
-**[Skills](https://github.com/marciopuga/cog-skills)** for agents that load skills rather than `AGENTS.md`.
+**[cog-skills](https://github.com/marciopuga/cog-skills)** installs the `/cog` command into other agents.
 
 ## Quick start
 
@@ -22,7 +22,7 @@ If you cloned somewhere else, set `COG_HOME` (for example `export COG_HOME=~/pro
 Memory lives in one place, `~/cog/memory/`. Keep it there and don't scaffold memory inside each project.
 
 - **Claude Code, everywhere:** add `@~/cog/AGENTS.md` to `~/.claude/CLAUDE.md`, and copy `.claude/commands/cog.md` to `~/.claude/commands/`.
-- **Codex, Cursor, Gemini CLI and others:** point the agent's own instruction file at `~/cog/AGENTS.md`, or install the skill with `npx skills add marciopuga/cog-skills`.
+- **Codex, Cursor, Gemini CLI and others:** point the agent's own instruction file at `~/cog/AGENTS.md`, and install the `/cog` command with `npx skills add marciopuga/cog-skills`.
 
 ## How it works
 

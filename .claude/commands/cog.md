@@ -3,7 +3,7 @@ description: Cog memory. Saves what this conversation added; sets memory up on f
 ---
 # /cog
 
-Follow `AGENTS.md`: the right file, its line format, absolute dates. Memory is `$COG_HOME/memory`, else `~/cog/memory`. If it's missing, tell the person to clone Cog to `~/cog` (or set `COG_HOME`) and stop.
+Cog lives in `$COG_HOME`, else `~/cog`. If it's missing, tell the person to clone https://github.com/marciopuga/cog to `~/cog` (or set `COG_HOME`) and stop. Follow its `AGENTS.md`: the right file, its line format, absolute dates. Read it first if it isn't already in your instructions.
 
 Read `hot-memory.md` and the `l0:` map if you haven't this session, then pick one path.
 
