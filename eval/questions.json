@@ -1,0 +1,22 @@
+[
+  {"id": 1, "kind": "who", "q": "Who is my manager at work?", "answer": "Rosalind Achterberg (CEO)", "keys": [["Rosalind"]]},
+  {"id": 2, "kind": "who", "q": "Who coaches Arlo's swimming?", "answer": "Delphine Achebe", "keys": [["Delphine"]]},
+  {"id": 3, "kind": "who", "q": "Who is fitting our kitchen?", "answer": "Hal Pennick (Pennick Joinery)", "keys": [["Pennick"]]},
+  {"id": 4, "kind": "who", "q": "Who was the second designer I hired this year, and when did they start?", "answer": "Kofi Brandt, started 2026-10-05", "keys": [["Kofi"], ["5 Oct", "Oct 5", "2026-10-05", "October 5", "5th"]]},
+  {"id": 5, "kind": "due", "q": "When is the Fieldcraft talk deck due to the organisers?", "answer": "2026-11-27", "keys": [["27"]]},
+  {"id": 6, "kind": "due", "q": "What do I need to do for the car, and by when?", "answer": "Book its first service by 2026-12-05", "keys": [["service"], ["5 Dec", "Dec 5", "2026-12-05", "December 5", "5th"]]},
+  {"id": 7, "kind": "due", "q": "Which of my work action items are overdue?", "answer": "The Heron accessibility audit for Rosalind (due 2026-11-14)", "keys": [["accessibility"]]},
+  {"id": 8, "kind": "due", "q": "When is Biscuit's vaccination booster due?", "answer": "2026-12-03", "keys": [["3 Dec", "Dec 3", "2026-12-03", "December 3", "3rd"]]},
+  {"id": 9, "kind": "asof", "q": "How many people were on the Heron team on 1 July 2026?", "answer": "6", "keys": [["6", "six"]]},
+  {"id": 10, "kind": "asof", "q": "What was my resting heart rate in March 2026?", "answer": "61 bpm", "keys": [["61"]]},
+  {"id": 11, "kind": "asof", "q": "What was my job title at the spring offsite?", "answer": "Senior product designer (the head of design role started 2026-04-01)", "keys": [["senior"]]},
+  {"id": 12, "kind": "asof", "q": "What was our mortgage rate in July 2026?", "answer": "5.1% variable", "keys": [["5.1"]]},
+  {"id": 13, "kind": "event", "q": "What did Arlo manage for the first time during the summer holiday?", "answer": "Swam in the sea without armbands", "keys": [["armband"]]},
+  {"id": 14, "kind": "event", "q": "What did we decide about Heron's scope at the offsite?", "answer": "Offline maps cut from 1.0 and moved to 1.1", "keys": [["offline map"], ["1.1"]]},
+  {"id": 15, "kind": "event", "q": "What injury did I have in the weeks before the half marathon?", "answer": "A left calf strain (2026-10-02)", "keys": [["calf"]]},
+  {"id": 16, "kind": "event", "q": "What went wrong right after the Heron launch?", "answer": "Sync server overloaded; background sync rolled back (2026-10-15), back on 2026-10-21", "keys": [["sync"]]},
+  {"id": 17, "kind": "state", "q": "Where are we with the kitchen renovation?", "answer": "Worktops fitted; waiting for the green splashback tiles (delivery 2026-11-26)", "keys": [["splashback", "tiles"]]},
+  {"id": 18, "kind": "state", "q": "How far along is the design system migration?", "answer": "68% of screens on tokens v2", "keys": [["68"]]},
+  {"id": 19, "kind": "state", "q": "What was my half marathon time?", "answer": "1:52:40", "keys": [["1:52"]]},
+  {"id": 20, "kind": "history", "q": "What did the vet find at Biscuit's check-up in February?", "answer": "A grade 1 heart murmur", "keys": [["murmur"]]}
+]
