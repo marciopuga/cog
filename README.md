@@ -32,9 +32,9 @@ At the start of every session the agent reads three small things:
 |---|---|
 | `memory/hot-memory.md` | What's going on now (at most 25 lines) |
 | `memory/patterns.md` | How you want it to work (at most 40 lines, written by hand) |
-| Every `l0:` line | The map: one line per file, giving its path and a one-line summary. It's a single search, so there's no index to keep up to date. |
+| The top of the map | The `l0:` line of each root file and of each folder's `index.md`: one line per file or folder |
 
-The map tells it which file to open. A file over 80 lines gets its headings listed first, then only the section it needs. A name no summary mentions gets one search inside the likely folder.
+The map opens one level at a time. When a folder fits the question, the agent reads the `l0:` lines of that folder's files and one line per subfolder, and goes down only where a summary fits. A tree of hundreds of files still costs a few dozen lines to navigate, and nothing is generated: each folder's `index.md` is one hand-written line. A file over 80 lines gets its headings listed first, then only the section it needs. A name no summary mentions gets one search inside the likely folder.
 
 Time questions need no tool, because every dated line starts with its date:
 - **A value on a date:** the `facts.md` line whose `from:`/`until:` window covers that date.
@@ -52,6 +52,7 @@ That is the whole retrieval model. It works because the agent navigates rather t
     facts.md             values that change over time
     events.md            named dated anchors: trips, launches, appointments
     personal/            a folder per area of life or work
+      index.md           one l0: line saying what the folder holds
       observations.md
       action-items.md
       entities.md
@@ -119,20 +120,20 @@ Both copies hold the same facts. `eval/run.py` is a development tool, not part o
 | | Cog v1 | Cog v2 |
 |---|---|---|
 | Correct | 20/20 | 20/20 |
-| Tool calls, total | 42 | 37 |
-| Input tokens per question (incl. cache) | 61.5k | 53.0k |
-| Cost for all 20 | $1.07 | $0.95 |
+| Tool calls, total | 42 | 34 |
+| Input tokens per question (incl. cache) | 61.5k | 49.2k |
+| Cost for all 20 | $1.07 | $0.88 |
 
 | Question type | v1 tool calls | v2 tool calls | v1 tokens | v2 tokens |
 |---|---|---|---|---|
-| Who (4) | 8 | 9 | 59k | 61k |
-| What's due (4) | 9 | 8 | 64k | 55k |
-| Value on a date (4) | 10 | 6 | 71k | 46k |
-| Before / during / after an event (4) | 7 | 7 | 54k | 52k |
-| Current state of a topic (3) | 6 | 6 | 59k | 56k |
-| Archived history (1) | 2 | 1 | 59k | 37k |
+| Who (4) | 8 | 9 | 59k | 60k |
+| What's due (4) | 9 | 6 | 64k | 45k |
+| Value on a date (4) | 10 | 5 | 71k | 40k |
+| Before / during / after an event (4) | 7 | 7 | 54k | 51k |
+| Current state of a topic (3) | 6 | 5 | 59k | 49k |
+| Archived history (1) | 2 | 2 | 59k | 54k |
 
-Both versions answered everything correctly. The example memory is small enough that v1 finds every answer too, so accuracy here only shows that v2 loses nothing. The difference is in the work. v2 reached the same answers with fewer reads and about 14% fewer input tokens, mostly on questions about a value on a date, where one `facts.md` line replaces searching through History sections. Each question ran once, so expect a few calls of noise either way.
+Both versions answered everything correctly. The example memory is small enough that v1 finds every answer too, so accuracy here only shows that v2 loses nothing. The difference is in the work. v2 reached the same answers with fewer reads and about 20% fewer input tokens, mostly on questions about a value on a date, where one `facts.md` line replaces searching through History sections. Each question ran once, so expect a few calls of noise either way. The v2 run used the example with its home topics grouped into a `personal/home/` subfolder, so the map is navigated across two levels.
 
 During development, v2 briefly shipped a helper script for archiving and date queries. It used 32 tool calls and 47.1k tokens per question on the same questions (`eval/results-v2-script.jsonl`). That was a little cheaper, but it cost a Python dependency, and the prompt-only version keeps the accuracy.
 
@@ -143,7 +144,7 @@ Earlier versions of Cog shipped about 1,700 lines of prompts. They included week
 The rule behind the cut: a routine has to change files. One that writes a report for another routine to read doesn't make the cut.
 
 - **Backlink index:** searching for `[[folder/file` gives backlinks on demand.
-- **Generated indexes:** the `l0:` lines are the index, read with one search.
+- **Generated indexes:** each file's `l0:` line is its index entry, and each folder's `index.md` is one hand-written line.
 - **Self-observations, run logs, foresight, scenarios:** you can just ask the agent. When the same correction comes up twice, write it in `patterns.md`.
 - **Automated pattern promotion and weekly reflection:** `/cog` works from the conversation, which is where new facts actually come from.
 - **Domain manifest and keyword triggers:** an agent reading one-line summaries routes just as well.
@@ -154,6 +155,7 @@ The rule behind the cut: a routine has to change files. One that writes a report
 
 Run `/cog`. When it finds a v1 folder it offers to convert it:
 - `<!-- L0: -->` comments become `l0:` frontmatter.
+- Each `domains.yml` label becomes the `l0:` of that folder's `index.md`.
 - `calendar.md` becomes `events.md`.
 - `cog-meta/patterns.md` becomes `patterns.md`.
 - `domains.yml`, `link-index.md`, the `INDEX.md` files and the rest of `cog-meta/` move to `glacier/legacy/`.

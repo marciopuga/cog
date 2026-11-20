@@ -12,7 +12,8 @@ Read `hot-memory.md` and the `l0:` map if you haven't this session, then pick on
 Offer to convert it, and convert only after a yes:
 - `<!-- L0: text -->` becomes frontmatter `l0: text`;
 - `calendar.md` lines become `events.md` lines, and `cog-meta/patterns.md` becomes `patterns.md`;
-- `domains.yml`, `link-index.md`, the `INDEX.md` files and the rest of `cog-meta/` move to `glacier/legacy/`.
+- each folder's `label` in `domains.yml` becomes the `l0:` of a new `<folder>/index.md`;
+- `domains.yml`, `link-index.md`, the old `INDEX.md` files and the rest of `cog-meta/` move to `glacier/legacy/`.
 
 Then continue with Save.
 
@@ -22,7 +23,7 @@ Then continue with Save.
    - What do you do for work, and where?
    - Any side projects, studies or other areas you want me to keep track of?
    - What should I always know about you: name, who you live with, where?
-2. Create a folder for each area (lower case, hyphens, e.g. `work/`, `studio/`), 2-4 in all; `personal/` already exists. In each one create `observations.md`, `action-items.md` and `entities.md`, copying the frontmatter and format comment from `personal/` and adjusting the `l0:`.
+2. Create a folder for each area (lower case, hyphens, e.g. `work/`, `studio/`), 2-4 in all; `personal/` already exists. In each one create `index.md` (only an `l0:` line saying what the folder holds), `observations.md`, `action-items.md` and `entities.md`, copying the frontmatter and format comment from `personal/` and adjusting the `l0:`.
 3. Write what you learned: a **Who** line and one line per area in `hot-memory.md`, people in `entities.md`, changeable values (role, employer, city) in `facts.md`, and dates people will refer back to in `events.md`.
 4. Show the `l0:` map. Tell the person: ask about your life normally, and run `/cog` at the end of a session.
 

@@ -12,13 +12,15 @@ Use whatever tools you have for reading, searching and editing files: a built-in
 
 1. `hot-memory.md`: what is going on now.
 2. `patterns.md`: how the person wants you to work.
-3. The map: search all `.md` files under `memory/`, except `glacier/`, for lines matching `^l0:`. That's one line per file, giving its path and a one-line summary.
+3. The top of the map: the `l0:` line of every `.md` file directly in `memory/`, and of every folder's `index.md` (`memory/*/index.md`). That's one line per file and one per folder.
 
-These three are small, and together they tell you which file to open next.
+These three are small, and together they tell you where to look next.
+
+The map opens one level at a time and never all at once. Inside a folder, read the `l0:` lines of its own files (`<folder>/*.md`) plus one line per subfolder (`<folder>/*/index.md`). Go down a level only where a summary fits. Never search for `l0:` across the whole tree.
 
 ## Find
 
-- Pick at most two folders from the map, then the file whose summary fits. Over 80 lines: find its headings (lines matching `^#`) and read only the section you need.
+- Pick at most two folders from the top of the map, open their level of the map, and go down to the file whose summary fits. Over 80 lines: find its headings (lines matching `^#`) and read only the section you need.
 - People: the folder's `entities.md`. Tasks and deadlines: its `action-items.md`. A subject's current state: its topic file (`## Current State`).
 - A name or word that no summary mentions: search for it inside the likely folder, not across the whole tree.
 - History: the folder's `observations.md`, then its `glacier/`.
@@ -43,7 +45,9 @@ memory/
   facts.md          values that change over time
   events.md         named dated anchors: trips, launches, appointments
   <folder>/         one per area of life or work (personal/, work/, ...)
+    index.md        just an l0: line saying what the folder holds
     observations.md  action-items.md  entities.md  <topic>.md
+    <subfolder>/    grouped topic files, with its own index.md
     glacier/        archives: read when the question is about the past
 ```
 
@@ -70,6 +74,8 @@ Write immediately, into the file that owns the fact, in that file's format.
 - Current state that matters now: `hot-memory.md`. Remove lines that are no longer true.
 - The same correction twice: a rule in `patterns.md`.
 - A new file always gets its `l0:` line and format comment, or it won't show on the map.
+- A new folder gets an `index.md` holding only its `l0:` line. When a folder's contents change what it's about, update that line.
+- A folder past about 15 files: propose grouping related topic files into a subfolder with its own `index.md`.
 
 Rules:
 - Absolute dates only (`2026-11-20`, never "yesterday" or "in 3 days").

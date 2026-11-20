@@ -20,7 +20,7 @@ Border terrier, 7. Grade 1 heart murmur, watched yearly. [[personal/biscuit]]
 last: 2026-11-05
 
 ### Hal Pennick (kitchen fitter)
-Runs Pennick Joinery; doing the kitchen. Prefers text over calls. [[personal/kitchen-renovation]]
+Runs Pennick Joinery; doing the kitchen. Prefers text over calls. [[personal/home/kitchen-renovation]]
 last: 2026-11-16
 
 ### Delphine Achebe (swimming coach)
