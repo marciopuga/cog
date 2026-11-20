@@ -1,0 +1,67 @@
+---
+l0: Dated log of what happened at home and with the family
+---
+<!-- Append only. Format: - YYYY-MM-DD [tag, tag]: text [[domain/file]] (optional about:YYYY-MM-DD after the tags = when it happened) -->
+
+- 2026-01-04 [garden]: Ordered seed potatoes and a second compost bin [[personal/garden]]
+- 2026-01-09 [health, running]: Joined the Hollins Reach running club, Tuesday and Thursday evenings [[personal/half-marathon]]
+- 2026-01-12 [kids, arlo]: Arlo started Saturday swimming lessons at Stage 2 [[personal/arlo-swimming]]
+- 2026-01-20 [money]: Mortgage broker says wait until late summer before fixing [[personal/money]]
+- 2026-01-27 [home, kitchen]: First kitchen quote from Hal Pennick: too high, asked for a cheaper worktop option [[personal/kitchen-renovation]]
+- 2026-02-03 [kids, mabel]: Parents' evening: Mabel's reading is behind, maths ahead [[personal/mabel-school]]
+- 2026-02-11 [dog, biscuit]: Vet check-up: Biscuit has a grade 1 heart murmur, nothing to treat, recheck in a year [[personal/biscuit]]
+- 2026-02-14 [family]: Teo and I went to the Lantern Room for dinner, first night out since autumn
+- 2026-02-21 [garden]: Built two raised beds by the back fence with Teo [[personal/garden]]
+- 2026-02-26 [home, kitchen]: Accepted Hal's second quote, laminate worktops instead of oak [[personal/kitchen-renovation]]
+- 2026-03-02 [health]: Physio for a stiff lower back; exercises twice a day [[personal/health]]
+- 2026-03-08 [kids, arlo]: Arlo lost his first tooth
+- 2026-03-12 [family, teo]: Teo took on a big joinery job at the Corner House pub, busy until May
+- 2026-03-21 [garden]: Planted the first early potatoes [[personal/garden]]
+- 2026-03-28 [reading]: Finished The Long Field; started The Salt Path of Hours [[personal/reading]]
+- 2026-04-02 [work-life]: Promotion to head of product design means one late night a week; agreed Thursday is mine for pickup
+- 2026-04-07 [kids, mabel]: Mabel started reading support at school, twice a week [[personal/mabel-school]]
+- 2026-04-15 [dog, biscuit]: Biscuit ate a tennis ball; vet trip, no surgery needed [[personal/biscuit]]
+- 2026-04-19 [health, running]: First 5 km without stopping since the back trouble [[personal/half-marathon]]
+- 2026-04-22 [money]: Opened the kitchen savings pot, 400 a month [[personal/money]]
+- 2026-04-26 [garden]: Frost got the courgette seedlings; resowed under glass [[personal/garden]]
+- 2026-04-30 [home, kitchen]: Kitchen demolition booked for 4 May; boxes packed [[personal/kitchen-renovation]]
+- 2026-05-04 [home, kitchen]: Demolition day. Found old water damage behind the sink wall [[personal/kitchen-renovation]]
+- 2026-05-09 [home, kitchen]: Water damage repair adds two weeks and about 1,200 to the budget [[personal/kitchen-renovation]]
+- 2026-05-16 [kids, mabel]: Mabel's class assembly about rivers; she read her part without help [[personal/mabel-school]]
+- 2026-05-23 [garden]: Lifted the first potatoes, good crop [[personal/garden]]
+- 2026-05-30 [family]: Teo's parents visited for the weekend
+- 2026-06-03 [health, running]: Signed up for the Hollins Reach half marathon on 25 Oct [[personal/half-marathon]]
+- 2026-06-10 [health]: Resting heart rate down to 56 on the watch [[personal/health]]
+- 2026-06-15 [health, running]: Training plan from the club coach starts: long run 8 km [[personal/half-marathon]]
+- 2026-06-21 [kids, birthday]: Arlo's sixth birthday at the park, eleven kids came
+- 2026-06-28 [home, kitchen]: Cabinets delivered; one door damaged, replacement ordered [[personal/kitchen-renovation]]
+- 2026-07-04 [reading]: Started Rivers of Glass [[personal/reading]]
+- 2026-07-11 [family, holiday]: Drove to Saltmarsh Point for two weeks [[personal/summer-holiday]]
+- 2026-07-18 [family, holiday] about:2026-07-17: Arlo swam in the sea without armbands for the first time [[personal/arlo-swimming]]
+- 2026-07-22 [family, holiday]: Mabel found a fossil ammonite on the north beach [[personal/summer-holiday]]
+- 2026-07-26 [family, holiday]: Home from Saltmarsh; Biscuit back from the kennels limping slightly [[personal/biscuit]]
+- 2026-08-01 [health, running]: Long run up to 14 km [[personal/half-marathon]]
+- 2026-08-09 [dog, biscuit]: Biscuit's limp gone after a week of rest [[personal/biscuit]]
+- 2026-08-17 [money]: Booked the remortgage appointment for 28 Aug [[personal/money]]
+- 2026-08-28 [money]: Fixed the mortgage at 4.3% for three years, starts 1 Sep [[personal/money]]
+- 2026-09-02 [kids, mabel]: Mabel started Year 5 with Ms Varga; reading support continues [[personal/mabel-school]]
+- 2026-09-07 [kids, arlo]: Arlo moved up to Stage 3 swimming [[personal/arlo-swimming]]
+- 2026-09-12 [home, car]: Sold the old hatchback, collected the electric estate [[personal/car]]
+- 2026-09-20 [health, running]: Long run 19 km, legs fine [[personal/half-marathon]]
+- 2026-09-26 [home, kitchen]: Plumbing first fix done; worktops ordered [[personal/kitchen-renovation]]
+- 2026-10-02 [health, running]: Left calf strain on the hill session; physio says rest five days [[personal/half-marathon]]
+- 2026-10-09 [health, running]: Calf fine on a 10 km test run [[personal/half-marathon]]
+- 2026-10-15 [kids, mabel]: Mabel asked for a climbing wall party for her tenth [[personal/birthday-party]]
+- 2026-10-18 [home, car]: Home charger installed on the drive [[personal/car]]
+- 2026-10-25 [health, running]: Ran the half marathon in 1:52:40, first one ever [[personal/half-marathon]]
+- 2026-10-27 [health, running] about:2026-10-25: Teo and the kids were at mile 10 with a sign; best part of the day
+- 2026-10-30 [health]: Resting heart rate 54 after the race block [[personal/health]]
+- 2026-11-02 [home, kitchen]: Worktops arrived chipped; Hal sent them back [[personal/kitchen-renovation]]
+- 2026-11-05 [dog, biscuit]: Reminder from the vet: booster due early December [[personal/biscuit]]
+- 2026-11-07 [kids, birthday]: Booked the climbing wall for 29 Nov, 12 kids [[personal/birthday-party]]
+- 2026-11-10 [home, kitchen]: Replacement worktops fitted; sink working again [[personal/kitchen-renovation]]
+- 2026-11-12 [reading]: Finished Rivers of Glass, five stars [[personal/reading]]
+- 2026-11-14 [kids, mabel]: Ms Varga says Mabel's reading has caught up to the class [[personal/mabel-school]]
+- 2026-11-16 [home, kitchen]: Chose the green splashback tiles; delivery 26 Nov [[personal/kitchen-renovation]]
+- 2026-11-18 [home, car]: Car's first service is due by 5 Dec [[personal/car]]
+- 2026-11-19 [family, winter-break]: Agreed Christmas at Teo's parents in Ashby Fold, 23 to 27 Dec

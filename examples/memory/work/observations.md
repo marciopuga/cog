@@ -1,0 +1,35 @@
+---
+l0: Dated log of work at Quillmoor: decisions, launches, people
+---
+<!-- Append only. Format: - YYYY-MM-DD [tag, tag]: text [[domain/file]] (optional about:YYYY-MM-DD after the tags = when it happened) -->
+
+- 2026-01-05 [heron]: Heron kickoff: field-survey app for ecologists, team of four [[work/heron-launch]]
+- 2026-01-14 [design-system]: Audit found 41 button variants across products [[work/design-system]]
+- 2026-01-28 [heron, research]: Six field interviews; offline use is the top need [[work/heron-launch]]
+- 2026-02-10 [okrs]: Q1 OKRs set: ship Heron beta by summer [[work/okrs]]
+- 2026-02-24 [design-system]: Tokens v1 published [[work/design-system]]
+- 2026-03-04 [team]: Weekly design critique moved to Wednesdays 10:00 [[work/team-rituals]]
+- 2026-03-17 [offsite, heron] about:2026-03-17: Offsite decision: offline maps cut from Heron 1.0 and moved to 1.1, to protect the October launch [[work/offsite]]
+- 2026-03-18 [offsite]: Offsite: Rosalind wants one design lead across Heron and the website [[work/offsite]]
+- 2026-03-30 [career]: Offered the head of product design role, starting 1 Apr
+- 2026-04-01 [career]: Started as head of product design; reporting to Rosalind Achterberg
+- 2026-04-20 [hiring]: Opened two designer roles for Heron [[work/hiring]]
+- 2026-05-12 [heron]: Usability test round 1: survey form too long, split into steps [[work/heron-launch]]
+- 2026-05-29 [hiring]: Hired Lena Fairweather (product designer), starts 1 Jun [[work/hiring]]
+- 2026-06-01 [heron]: Team is six with Lena and a second engineer [[work/heron-launch]]
+- 2026-06-18 [design-system]: Started migrating Heron screens to tokens v2 [[work/design-system]]
+- 2026-07-08 [budget]: H2 design budget approved: 38k incl. research incentives [[work/budget]]
+- 2026-08-03 [heron]: Beta opened to 40 field teams [[work/heron-launch]]
+- 2026-08-19 [heron, research]: Beta feedback: sync conflicts are the biggest complaint [[work/heron-launch]]
+- 2026-09-04 [conference]: Fieldcraft accepted my talk "Designing for no signal", 9 Dec [[work/conference-talk]]
+- 2026-09-15 [hiring]: Kofi Brandt accepted the second designer role, starts 5 Oct [[work/hiring]]
+- 2026-09-29 [design-system]: Tokens v2 shipped to all products [[work/design-system]]
+- 2026-10-05 [hiring]: Kofi Brandt's first day; paired with Lena on Heron [[work/hiring]]
+- 2026-10-14 [heron]: Heron 1.0 launched publicly [[work/heron-launch]]
+- 2026-10-15 [heron, incident]: Day after launch: sync server overloaded; rolled back background sync, manual sync only for now [[work/heron-launch]]
+- 2026-10-21 [heron]: Background sync back on after the queue fix [[work/heron-launch]]
+- 2026-10-28 [okrs]: Q4 OKR: 60% of field teams use Heron weekly [[work/okrs]]
+- 2026-11-03 [heron]: Heron 1.1 planning started: offline maps first [[work/heron-launch]]
+- 2026-11-06 [design-system]: 68% of screens migrated to tokens v2 [[work/design-system]]
+- 2026-11-11 [conference]: First full run-through of the Fieldcraft talk: 34 minutes, need 25 [[work/conference-talk]]
+- 2026-11-17 [team]: Started fortnightly 1:1s with Kofi [[work/team-rituals]]
