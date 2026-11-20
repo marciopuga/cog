@@ -6,20 +6,26 @@
       "Write",
       "Glob",
       "Grep",
-      "Bash(git status*)",
-      "Bash(git diff*)",
-      "Bash(git log*)",
-      "Bash(git add*)",
-      "Bash(git commit*)",
-      "Bash(mkdir*)",
-      "Bash(ls*)",
-      "Bash(grep*)",
-      "Bash(rg*)",
-      "Bash(find*)",
-      "Bash(wc*)",
-      "Bash(date*)",
-      "Bash(head*)",
-      "Bash(tail*)"
+      "Bash(bin/cog *)",
+      "Bash(python3 bin/cog *)",
+      "Bash(grep *)",
+      "Bash(sed -n *)",
+      "Bash(wc *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(date *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${COG_HOME:-$CLAUDE_PROJECT_DIR}/bin/cog\" tidy --quiet"
+          }
+        ]
+      }
     ]
   }
 }
