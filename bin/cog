@@ -1,0 +1,500 @@
+#!/usr/bin/env python3
+"""cog: keep a Cog memory folder tidy and answer date questions. Standard library only.
+
+  cog tidy [--dry-run] [--quiet]    archive by count, expire until: lines, rebuild index.md, check formats
+  cog migrate [--apply]             convert an older Cog layout to this one (dry run by default)
+  cog when                          recent and upcoming events, due soon, overdue
+  cog when <window...> [words...]   every dated line in the window, AND-filtered by words
+  cog when events | facts           named events | facts true today
+  cog when asof <date|event> [key]  facts true on that date
+  cog when timeline <key>           every value a fact key has had
+
+Windows (several = intersection): 2026-10-09  2026-10  july  today  yesterday  this-week  last-week
+  last:7d  next:14d  A..B  after:X  before:X  since:X  until:X  during:X  <event>
+  (X = a date, an event name or one of its aka: names)
+When options: --clock said|about|due|valid|any   --glacier (include archives)   --full
+
+Memory folder: --root DIR, else $COG_HOME/memory, else memory/ next to bin/, else ~/cog/memory.
+Today is $COG_TODAY (YYYY-MM-DD) when set, for tests and replays.
+"""
+import calendar
+import os
+import re
+import shutil
+import sys
+from datetime import date, timedelta
+
+# ---------- line formats: every format is defined here and nowhere else ----------
+
+D = r"\d{4}-\d{2}-\d{2}"
+FORMATS = {
+    "observation": re.compile(rf"^- ({D}) \[([^\]]+)\](?: about:({D})(?:\.\.({D}))?)?: \S"),
+    "action": re.compile(r"^- \[([ x])\] [^|]+?(?: \| [a-z]+:[^|]*?)*(?:\s*<!--.*-->)?$"),
+    "fact": re.compile(rf"^- ([a-z0-9-]+): (.+?) \| from:({D})? \| until:({D})?((?: \| [a-z]+:[^|]*)*)$"),
+    "event": re.compile(rf"^- ([a-z0-9-]+) \| ({D})(?:\.\.({D})?)?((?: \| [^|]*)*)$"),
+    "entity": re.compile(r"^### .+ \(.+\)$"),
+}
+CHECKED = {"observations.md": ("- ", "observation"), "action-items.md": ("- ", "action"),
+           "facts.md": ("- ", "fact"), "events.md": ("- ", "event"), "entities.md": ("### ", "entity")}
+UNTIL = re.compile(rf"\s*<!--[^>]*?\buntil:({D})[^>]*-->")
+CAPS = {"hot-memory.md": 25, "patterns.md": 40}
+OBS_MAX, OBS_KEEP, DONE_MAX, FOLD = 50, 40, 10, 12
+ROOT = None
+TODAY = date.fromisoformat(os.environ["COG_TODAY"]) if os.environ.get("COG_TODAY") else date.today()
+d = date.fromisoformat
+
+def read(path):
+    with open(path, encoding="utf-8", errors="replace") as f:
+        return f.read().split("\n")
+
+def write(path, lines):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if not os.path.exists(path) or read(path) != lines:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+
+def frontmatter(lines):
+    """(l0 or None, index of the first body line). l0 is the only key Cog reads."""
+    if not lines or lines[0] != "---" or "---" not in lines[1:]:
+        return None, 0
+    end = lines.index("---", 1)
+    l0 = next((s[3:].strip() for s in lines[1:end] if s.startswith("l0:")), "")
+    return (l0[1:-1] if l0[:1] in "\"'" and l0[-1:] == l0[:1] and len(l0) > 1 else l0) or None, end + 1
+
+def entries(lines, start=0):
+    """Top-level '- ' entries as [first, last] line ranges; indented lines belong to the entry above."""
+    out = []
+    for i in range(start, len(lines)):
+        if lines[i].startswith("- "):
+            out.append([i, i])
+        elif out and lines[i][:1] in (" ", "\t") and lines[i].strip() and out[-1][1] == i - 1:
+            out[-1][1] = i
+    return out
+
+def rel(path):
+    return os.path.relpath(path, ROOT)
+
+def memory_files(glacier=False):
+    for dirpath, dirs, files in os.walk(ROOT):
+        dirs[:] = sorted(x for x in dirs if not x.startswith(".") and (glacier or x != "glacier"))
+        yield from (os.path.join(dirpath, f) for f in sorted(files) if f.endswith(".md"))
+
+# ---------- tidy ----------
+
+def plan_moves(path, lines):
+    """{(glacier file, its l0): [(first, last, lines to write)]} for one file."""
+    name, out = os.path.basename(path), {}
+    folder = rel(os.path.dirname(path)) if os.path.dirname(path) != ROOT else "root"
+    ents = entries(lines, frontmatter(lines)[1])
+    if name == "observations.md":
+        dated = sorted((m.group(1), a, b, m.group(2).split(",")[0].strip())
+                       for a, b in ents for m in [FORMATS["observation"].match(lines[a])] if m)
+        for _, a, b, tag in dated[:len(dated) - OBS_KEEP] if len(dated) > OBS_MAX else []:
+            slug = re.sub(r"[^a-z0-9]+", "-", tag.lower()).strip("-") or "untagged"
+            out.setdefault((f"observations-{slug}.md", f"Archived {folder} observations tagged {tag}"), []).append((a, b, lines[a:b + 1]))
+        return out
+    done = []
+    for a, b in ents:
+        m = UNTIL.search(lines[a])
+        if m and d(m.group(1)) < TODAY:
+            text = re.sub(r"^\[[ x]\] ", "", UNTIL.sub("", lines[a])[2:])
+            line = f"- {m.group(1)} [expired]: {text} (from {rel(path)})"
+            out.setdefault(("expired.md", f"Lines from {folder} whose until: date passed"), []).append((a, b, [line] + lines[a + 1:b + 1]))
+        elif name == "action-items.md" and lines[a].startswith("- [x]"):
+            done.append((a, b, lines[a:b + 1]))
+    if len(done) > DONE_MAX:
+        out[("action-items-done.md", f"Completed {folder} action items")] = done
+    return out
+
+def tidy(dry=False, quiet=False):
+    moves, counts = [], {"observations": 0, "action-items-done": 0, "expired": 0}
+    for path in memory_files():
+        if os.path.basename(path) not in ("observations.md", "action-items.md", "hot-memory.md"):
+            continue
+        lines = read(path)
+        gone = set()
+        for (gname, l0), items in plan_moves(path, lines).items():
+            g = os.path.join(os.path.dirname(path), "glacier", gname)
+            moves.append(f"{rel(path)} -> {rel(g)}: {len(items)}")
+            counts[re.sub(r"(-[a-z0-9-]+)?\.md$", "", gname) if "done" not in gname else "action-items-done"] += len(items)
+            gone.update(i for a, b, _ in items for i in range(a, b + 1))
+            if not dry:  # the glacier is written before the source loses anything
+                old = read(g) if os.path.exists(g) else ["---", f"l0: {l0}", "---", "<!-- Written by cog tidy. Read-only. -->", "", ""]
+                write(g, old[:-1 if old[-1] == "" else None] + [s for *_, ls in items for s in ls] + [""])
+        if gone and not dry:
+            write(path, [s for i, s in enumerate(lines) if i not in gone])
+    nfiles, problems = build_index(dry), check()
+    if quiet and not moves and not problems:
+        return
+    print(f"cog tidy: {'would move' if dry else 'moved'} " + ", ".join(f"{n} {k}" for k, n in counts.items())
+          + f"; index: {nfiles} files; {len(problems)} format problems")
+    for s in (moves if dry or not quiet else []) + (problems[:10] if quiet else problems):
+        print("  " + s)
+    if quiet and len(problems) > 10:
+        print(f"  ... {len(problems) - 10} more (run: cog tidy)")
+
+def check():
+    """One regex per line format. Reports problems; never writes."""
+    out = []
+    for path in memory_files():
+        name, lines, top = os.path.basename(path), read(path), os.path.dirname(path) == ROOT
+        l0, body = frontmatter(lines)
+        if l0 is None and name != "index.md":
+            out.append(f"{rel(path)}:1: no l0: line in the frontmatter")
+        prefix, fmt = CHECKED.get(name, (None, None))
+        out += [f"{rel(path)}:{i + 1}: not a {fmt} line: {lines[i][:90]}" for i in range(body, len(lines))
+                if prefix and lines[i].startswith(prefix) and not FORMATS[fmt].match(lines[i])]
+        n = sum(1 for s in lines[body:] if s.strip() and not s.startswith("<!--"))
+        if top and n > CAPS.get(name, n):
+            out.append(f"{rel(path)}: {n} lines, cap is {CAPS[name]}")
+    return out
+
+def build_index(dry):
+    """memory/index.md: every folder and file with its l0 and line count. Folders over FOLD files fold."""
+    folders, glaciers, nfiles = {}, {}, 0
+    for path in memory_files(glacier=True):
+        folder, lines = os.path.dirname(path), read(path)
+        if "glacier" in rel(path).split(os.sep):
+            g = glaciers.setdefault(rel(folder), [0, 0])
+            g[0], g[1] = g[0] + 1, g[1] + len(lines)
+        elif os.path.basename(path) != "index.md":
+            folders.setdefault(folder, []).append((os.path.basename(path), len(lines), frontmatter(lines)[0] or ""))
+            nfiles += 1
+    table = ["| File | Lines | Summary |", "|---|---|---|"]
+    out = ["---", "l0: Map of memory, generated by cog tidy", "---",
+           "<!-- Generated by `cog tidy`. Do not edit. A folder's summary is the l0: of its own index.md. -->", ""]
+    out += table + [f"| {f} | {n} | {s} |" for f, n, s in folders.pop(ROOT, [])]
+    for folder, rows in sorted(folders.items()):
+        r, idx = rel(folder), os.path.join(folder, "index.md")
+        l0 = frontmatter(read(idx))[0] if os.path.exists(idx) else None
+        rows = table + [f"| {r}/{f} | {n} | {s} |" for f, n, s in rows] if len(rows) <= FOLD else \
+            [f"{len(rows)} files, folded: read {r}/index.md for summaries. " + ", ".join(f[:-3] for f, *_ in rows)]
+        if not dry and (os.path.exists(idx) or len(folders[folder]) > FOLD):
+            write(idx, ["---", f"l0: {l0 or ''}", "---", "<!-- Generated by `cog tidy` below the l0: line. -->", ""]
+                  + table + [f"| {r}/{f} | {n} | {s} |" for f, n, s in folders[folder]] + [""])
+        out += ["", f"## {r}/ — {l0 or ''}"] + rows
+    out += ["", "## glacier (archives, read for history only)"]
+    out += [f"- {g}/: {n} files, {k} lines" for g, (n, k) in sorted(glaciers.items())] or ["- none yet"]
+    if not dry:
+        write(os.path.join(ROOT, "index.md"), out + [""])
+    return nfiles
+
+# ---------- when: dated lines, events and facts ----------
+
+FAR_PAST, FAR_FUTURE = date(1970, 1, 1), date(2999, 12, 31)
+MONTHS = {m.lower(): i for i, m in enumerate(calendar.month_abbr) if m}
+MONTHS.update({m.lower(): i for i, m in enumerate(calendar.month_name) if m}, sept=9)
+
+def load_events():
+    """{name or aka, lower case: (start, end, note, name)} from events.md."""
+    events, path = {}, os.path.join(ROOT, "events.md")
+    for s in read(path) if os.path.exists(path) else []:
+        m = FORMATS["event"].match(s.strip())
+        if m:
+            rest = [x.strip() for x in m.group(4).split("|")[1:]]
+            end = d(m.group(3)) if m.group(3) else (FAR_FUTURE if f"{m.group(2)}.." in s else d(m.group(2)))
+            ev = (d(m.group(2)), end, rest[0] if rest else "", m.group(1))
+            for n in [m.group(1)] + [a.strip() for x in rest if x.startswith("aka:") for a in x[4:].split(",")]:
+                events.setdefault(n.lower(), ev)
+                events.setdefault(n.lower().replace(" ", "-"), ev)
+    return events
+
+def load_facts():
+    path, out = os.path.join(ROOT, "facts.md"), []
+    for m in (FORMATS["fact"].match(s.strip()) for s in (read(path) if os.path.exists(path) else [])):
+        if m:
+            src = re.search(r"\| src:([^|]*)", m.group(5) or "")
+            out.append((m.group(1), m.group(2), d(m.group(3)) if m.group(3) else FAR_PAST,
+                        d(m.group(4)) if m.group(4) else FAR_FUTURE, src.group(1).strip() if src else ""))
+    return out
+
+def valid(y, m, dd):
+    try:
+        return date(y, m, dd)
+    except (ValueError, TypeError):
+        return None
+
+def month_span(y, m):
+    return date(y, m, 1), date(y, m, calendar.monthrange(y, m)[1])
+
+mon_of = lambda s: MONTHS.get(s.lower()) or MONTHS.get(s.lower()[:3])  # noqa: E731
+monday = lambda x: x - timedelta(days=x.weekday())  # noqa: E731
+week = lambda mon: (mon, mon + timedelta(days=6))  # noqa: E731
+one = lambda x: (x, x, False) if x else None  # noqa: E731
+span = lambda a, b, approx=False: (a, b, approx) if a and b and a <= b else None  # noqa: E731
+
+def point(tok, events):
+    """A date-ish token -> (start, end)."""
+    if tok.lower() in events:
+        return events[tok.lower()][:2]
+    if re.fullmatch(D, tok):
+        return d(tok), d(tok)
+    if re.fullmatch(r"\d{4}-\d{2}", tok):
+        return month_span(*map(int, tok.split("-")))
+    if tok.lower() in MONTHS:
+        m = MONTHS[tok.lower()]
+        return month_span(TODAY.year if m <= TODAY.month else TODAY.year - 1, m)
+    if tok in ("today", "yesterday", "this-week", "last-week"):
+        x = TODAY - timedelta(days=tok == "yesterday")
+        return (x, x) if "week" not in tok else week(monday(TODAY) - timedelta(days=7 * (tok == "last-week")))
+    m = re.fullmatch(r"(last|next):(\d+)([dw])", tok)
+    if m:
+        n = timedelta(days=int(m.group(2)) * (7 if m.group(3) == "w" else 1))
+        return (TODAY - n, TODAY) if m.group(1) == "last" else (TODAY, TODAY + n)
+
+def window(tok, events):
+    if ".." in tok:
+        a, b = tok.split("..", 1)
+        pa, pb = point(a, events) if a else (FAR_PAST,) * 2, point(b, events) if b else (FAR_FUTURE,) * 2
+        return (pa[0], pb[1]) if pa and pb else None
+    m = re.fullmatch(r"(after|before|since|until|during):(.+)", tok)
+    if not m:
+        return point(tok, events)
+    p = point(m.group(2), events) or sys.exit(f"cog when: can't resolve '{m.group(2)}' (see `cog when events`)")
+    one_day = timedelta(days=1)
+    return {"after": (p[1] + one_day, FAR_FUTURE), "since": (p[0], FAR_FUTURE), "before": (FAR_PAST, p[0] - one_day),
+            "until": (FAR_PAST, p[1]), "during": p}[m.group(1)]
+
+
+# Line dating. Clocks: said (line date, added:/done:, dated heading), about (dates written in the text,
+# about: included), due (due:), valid (from:..until:). Only written dates count, never words like
+# "next week": memory lines carry absolute dates, so there is nothing to resolve.
+MON = r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
+DASH = r"\s*(?:[–—-]|to|until|\.\.)\s*"
+NOISE = re.compile(r"\[\[[^\]]*\]\]|`[^`]*`|https?://\S+")
+
+def year_for(mo, dd, anchor):
+    """Year for a yearless (month, day): the one nearest the anchor; earlier wins a tie."""
+    c = [(abs((x - anchor).days), x.year) for y in (anchor.year - 1, anchor.year, anchor.year + 1)
+         for x in [valid(y, mo, min(dd, calendar.monthrange(y, mo)[1]))] if x] if anchor else []
+    return min(c)[1] if c else None
+
+def _cross(m, ctx):
+    m1, m2 = mon_of(m[2]), mon_of(m[4])
+    if m[5]:
+        y2 = int(m[5])
+        y1 = y2 - 1 if m1 > m2 else y2
+    else:
+        y1 = year_for(m1, int(m[1]), ctx)
+        y2 = None if y1 is None else y1 + 1 if m2 < m1 else y1
+    return span(valid(y1, m1, int(m[1])), valid(y2, m2, int(m[3])))
+
+def _same(m, ctx):
+    mo = mon_of(m[3])
+    y = int(m[4]) if m[4] else year_for(mo, int(m[1]), ctx)
+    return span(valid(y, mo, int(m[1])), valid(y, mo, int(m[2])))
+
+ABSOLUTE_RULES = [
+    (rf"\b(\d{{4}})-(\d{{2}})-(\d{{2}})\.\.(\d{{4}})-(\d{{2}})-(\d{{2}})\b",
+     lambda m, c: span(valid(*map(int, m.groups()[:3])), valid(*map(int, m.groups()[3:])))),
+    (r"\b(\d{4})-(\d{2})-(\d{2})\b", lambda m, c: one(valid(*map(int, m.groups())))),
+    (r"\bweek of (\d{1,2})\s+" + MON + r"\.?\s+(\d{4})\b",
+     lambda m, c: (lambda x: span(x, x + timedelta(days=6)) if x else None)(valid(int(m[3]), mon_of(m[2]), int(m[1])))),
+    (r"\b(\d{1,2})\s+" + MON + r"\.?" + DASH + r"(\d{1,2})\s+" + MON + r"\b(?:\.?,?\s+(\d{4})\b)?", _cross),
+    (r"\b(\d{1,2})" + DASH + r"(\d{1,2})\s+" + MON + r"\b(?:\.?,?\s+(\d{4})\b)?", _same),
+    (r"\b(\d{1,2})(?:st|nd|rd|th)?(?:\s+of)?\s+" + MON + r"\.?,?\s+(\d{4})\b", lambda m, c: one(valid(int(m[3]), mon_of(m[2]), int(m[1])))),
+    (r"\b" + MON + r"\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b", lambda m, c: one(valid(int(m[3]), mon_of(m[1]), int(m[2])))),
+    (r"\b(\d{4})/(\d{2})/(\d{2})\b", lambda m, c: one(valid(*map(int, m.groups())))),
+    (r"\b" + MON + r"\.?,?\s+(\d{4})\b", lambda m, c: (*month_span(int(m[2]), mon_of(m[1])), False)),
+    (r"\b(\d{1,2})(?:st|nd|rd|th)?(?:\s+of)?\s+" + MON + r"\b(?!\.?,?\s+\d{4})", lambda m, c: one(valid(year_for(mon_of(m[2]), int(m[1]), c), mon_of(m[2]), int(m[1])))),
+    (r"\b" + MON + r"\s+(\d{1,2})(?:st|nd|rd|th)?\b(?!,?\s+\d{4})", lambda m, c: one(valid(year_for(mon_of(m[1]), int(m[2]), c), mon_of(m[1]), int(m[2])))),
+    (r"\b(?:in|during|since|until|before|after|by|from|of)\s+((?:19|20)\d{2})\b",
+     lambda m, c: (date(int(m[1]), 1, 1), date(int(m[1]), 12, 31), False)),
+]
+
+RULES = [(re.compile(rx, re.I), fn) for rx, fn in ABSOLUTE_RULES]
+SAID_PREFIX = re.compile(rf"^\s*(?:#{{1,6}}\s+)?(?:[-*]\s+)?(?:\[[ x]\]\s+)?(?:\*\*|<!--\s*)?({D})\b")
+SAID_TAG = re.compile(rf"\b(?:added|done|reconciled):\s?({D})\b")
+DUE_TAG = re.compile(r"\bdue:\s?(\d{4})-(\d{2})-(\d{2})\b")
+VALIDITY_TAG = re.compile(rf"\b(from|until):\s?({D})?(?:\.\.)?")
+
+def date_line(line, section_date, hint=None):
+    """[(clock, start, end)] for one line. A yearless day ("25 Sep") takes the year nearest the
+    line's own date, else the dated heading above it, else `hint` (the file's date)."""
+    out, own = [], SAID_PREFIX.match(line)
+    text = NOISE.sub(lambda m: " " * len(m.group(0)), line)
+    tags = list(SAID_TAG.finditer(text))
+    said = d(own.group(1)) if own and valid(*map(int, own.group(1).split("-"))) else None
+    out += ([("said", said, said)] if said else []) + [("said", d(t.group(1)), d(t.group(1))) for t in tags]
+    anchor = said or (d(tags[0].group(1)) if tags else None) or section_date
+    taken, vf, vu = ([own.span()] if own else []) + [t.span() for t in tags], None, None
+    for m in VALIDITY_TAG.finditer(text):
+        taken.append(m.span())
+        if m.group(2) and valid(*map(int, m.group(2).split("-"))):
+            vf, vu = (d(m.group(2)), vu) if m.group(1) == "from" else (vf, d(m.group(2)))
+    out += [("valid", vf or FAR_PAST, vu or FAR_FUTURE)] if vf or vu else []
+    for m in DUE_TAG.finditer(text):
+        x = valid(int(m[1]), int(m[2]), int(m[3]))
+        out, taken = out + ([("due", x, x)] if x else []), taken + [m.span()]
+    for rx, fn in RULES:
+        for m in rx.finditer(text):
+            sp = None if any(m.start() < te and m.end() > ts for ts, te in taken) else fn(m, anchor or hint)
+            if sp:
+                out.append(("about", sp[0], sp[1]))
+                taken.append(m.span())
+    return list(dict.fromkeys(out))
+
+def scan(include_glacier):
+    for path in (p for p in memory_files(include_glacier) if os.path.basename(p) != "index.md"):
+        lines, section = read(path), None
+        body = frontmatter(lines)[1]
+        lu = next((m.group(1) for s in lines[:body] for m in [re.match(rf"^last_updated:\s*['\"]?({D})", s)] if m), None)
+        hint = d(lu) if lu else date.fromtimestamp(os.path.getmtime(path))
+        for i, s in enumerate(lines[body:], body + 1):
+            h = re.match(rf"^#{{2,4}} .*?({D})", s)
+            section = d(h.group(1)) if h else section
+            spans = ([("said", section, section)] if h else []) + date_line(s, section, hint)
+            if spans and (h or not (s.startswith("<!--") and "from:" not in s)):
+                yield path, i, s, spans
+
+def fmt_span(a, b):
+    return a.isoformat() if a == b else f"{'…' if a == FAR_PAST else a}..{'…' if b == FAR_FUTURE else b}"
+
+def snip(s, full):
+    s = re.sub(r"\s+", " ", s.strip())
+    return s if full or len(s) <= 160 else s[:157] + "..."
+
+def hits_window(a, b, lo, hi):
+    """Finite spans match on overlap; open-ended ones only where they start or stop."""
+    if a == FAR_PAST or b == FAR_FUTURE:
+        return any(lo <= e <= hi for e in (a, b) if e not in (FAR_PAST, FAR_FUTURE))
+    return a <= hi and b >= lo
+
+def query(lo, hi, words, clock, glacier, full):
+    hits = []
+    for path, n, s, spans in scan(glacier):
+        match = [(c, a, b) for c, a, b in spans if clock in ("any", c) and hits_window(a, b, lo, hi)]
+        if match and all(w.lower() in s.lower() for w in words):
+            c, a, b = min(match, key=lambda t: (t[0] != "said", t[1]))
+            wide = a != FAR_PAST and b != FAR_FUTURE and (b - a).days > 31  # long periods (H2, Jul–Dec) sort last
+            hits.append((wide, a if lo <= a <= hi else (b if lo <= b <= hi else lo), c, fmt_span(a, b), rel(path), n, s))
+    print(f"# {fmt_span(lo, hi)}  ({len(hits)} lines{', clock=' + clock if clock != 'any' else ''}{', words=' + ' '.join(words) if words else ''})")
+    for _, _, c, sp, f, n, s in sorted(hits, key=lambda h: h[:2] + (h[4], h[5])):
+        print(f"{sp:<22} {c:<6} {f}:{n}  {snip(s, full)}")
+
+def awareness(events, glacier, full):
+    print(f"# today {TODAY.isoformat()} ({TODAY.strftime('%a')})\n\n## Events, last 14d → next 45d")
+    for a, b, note, name in sorted(set(events.values())):
+        if a <= TODAY + timedelta(days=45) and b >= TODAY - timedelta(days=14):
+            k = (a - TODAY).days
+            print(f"  {fmt_span(a, b):<22} {'now' if a <= TODAY <= b else (f'in {k}d' if k > 0 else f'{-k}d ago'):<8} {name}: {note}")
+    rows = {"soon": [], "late": []}
+    for path, n, s, spans in scan(glacier):
+        due = [a for c, a, _ in spans if c == "due"]
+        if s.lstrip().startswith("- [ ]") and due and due[0] <= TODAY + timedelta(days=7):
+            rows["late" if due[0] < TODAY else "soon"].append((due[0], rel(path), n, s))
+    for title, key in (("## Due in the next 7d", "soon"), (f"## Overdue open items ({len(rows['late'])})", "late")):
+        print(f"\n{title}")
+        for a, f, n, s in sorted(rows[key])[: 40 if full else 15]:
+            print(f"  {a.isoformat()}  {f}:{n}  {snip(s.replace('- [ ] ', ''), full)}")
+
+def when(argv):
+    args, clock, it = [], "any", iter(argv)
+    for a in it:
+        if a == "--clock" or a.startswith("--clock="):
+            clock = next(it, "any") if a == "--clock" else a.split("=", 1)[1]
+        elif a not in ("--glacier", "--full"):
+            args.append(a)
+    glacier, full, events = "--glacier" in argv, "--full" in argv, load_events()
+    if not args:
+        return awareness(events, glacier, full)
+    if args[0] == "events":
+        for a, b, note, name in sorted(set(events.values())):
+            print(f"{fmt_span(a, b):<22} {name}: {note}")
+    elif args[0] in ("facts", "asof"):
+        on, rest = TODAY, args[1:]
+        if args[0] == "asof":
+            p = (point(rest[0], events) if rest else None) or sys.exit("usage: cog when asof <date|event> [key]")
+            on, rest = p[0], rest[1:]
+        print(f"# facts as of {on.isoformat()}")
+        for key, val, f, u, src in load_facts():
+            if (not rest or key in rest) and f <= on < u:
+                print(f"  {key}: {val}   [{fmt_span(f, u)}]")
+    elif args[0] == "timeline":
+        rows = sorted((f, u, v, s) for k, v, f, u, s in load_facts() if k in args[1:2])
+        for f, u, v, s in rows or sys.exit(f"cog when: no such fact key (keys: {', '.join(sorted({k for k, *_ in load_facts()}))})"):
+            print(f"{fmt_span(f, u):<24} {v}   {s}")
+    else:
+        lo, hi, words = FAR_PAST, FAR_FUTURE, []
+        for a in args:
+            w = window(a, events)
+            lo, hi, words = (max(lo, w[0]), min(hi, w[1]), words) if w else (lo, hi, words + [a])
+        if (lo, hi) == (FAR_PAST, FAR_FUTURE) or lo > hi:
+            sys.exit("cog when: no window given, or an empty one (try `cog when last:7d` or `cog -h`)")
+        query(lo, hi, words, clock, glacier, full)
+
+# ---------- migrate: an older Cog layout to this one ----------
+
+def migrate(apply):
+    steps, legacy = [], os.path.join(ROOT, "glacier", "legacy")
+
+    def step(msg, fn):
+        steps.append(msg)
+        return apply and fn()
+
+    def move(src, dst):
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.move(src, dst)
+
+    for path in memory_files(glacier=True):
+        lines = read(path)
+        if os.path.basename(path) == "INDEX.md":
+            step(f"delete {rel(path)} (generated; tidy writes index.md)", lambda p=path: os.remove(p))
+            continue
+        new, i = list(lines), next((k for k, s in enumerate(lines[:12]) if "<!-- L0:" in s), None)
+        if i is not None:
+            l0 = re.sub(r".*<!-- L0:\s*(.*?)\s*-->.*", r"\1", new.pop(i))
+            l0 = f'"{l0}"' if ": " in l0 else l0
+            if not new or new[0] != "---":
+                new = ["---", f"l0: {l0}", "---"] + new
+            elif frontmatter(new)[0] is None:
+                new.insert(1, f"l0: {l0}")
+        new = [re.sub(rf"until:({D})\s+grace:(\d+)", lambda m: f"until:{d(m[1]) + timedelta(days=int(m[2]))}", s) for s in new]
+        if new != lines:
+            step(f"rewrite {rel(path)}: L0 comment -> l0: frontmatter, grace folded into until:", lambda p=path, n=new: write(p, n))
+    manifest = os.path.join(ROOT, "domains.yml")
+    yml = "\n".join(read(manifest)) if os.path.exists(manifest) else ""
+    for m in re.finditer(r"path:\s*(\S+)\s*\n(?:\s+\w+:.*\n)*?\s+label:\s*\"?([^\"\n]+)", yml):
+        idx = os.path.join(ROOT, m.group(1), "index.md")
+        if os.path.isdir(os.path.dirname(idx)) and m.group(1) != "cog-meta":
+            step(f"write {rel(idx)} with l0: {m.group(2)}", lambda p=idx, l=m.group(2): write(p, ["---", f"l0: {l}", "---", ""]))
+    cals, ev = [p for p in memory_files() if os.path.basename(p) == "calendar.md"], os.path.join(ROOT, "events.md")
+
+    def to_events():
+        out = read(ev) if os.path.exists(ev) else ["---", "l0: Named dated anchors that resolve \"before / after / during X\"", "---",
+                                                   "<!-- Format: - name | YYYY-MM-DD(..YYYY-MM-DD) | note | aka: Other Name -->", ""]
+        for c in cals:
+            out += ["", f"## from {rel(c)} (rewrite these as event lines)"] + read(c)[frontmatter(read(c))[1]:]
+            move(c, os.path.join(legacy, rel(c).replace(os.sep, "-")))
+        write(ev, out)
+    if cals:
+        step("merge " + ", ".join(map(rel, cals)) + " into events.md (originals to glacier/legacy/)", to_events)
+    pat = os.path.join(ROOT, "cog-meta", "patterns.md")
+    if os.path.exists(pat) and not os.path.exists(os.path.join(ROOT, "patterns.md")):
+        step("move cog-meta/patterns.md -> patterns.md", lambda: move(pat, os.path.join(ROOT, "patterns.md")))
+    for old in ("cog-meta", "link-index.md", "domains.yml", "glacier/index.md"):
+        if os.path.exists(os.path.join(ROOT, old)):
+            step(f"move {old} -> glacier/legacy/", lambda o=old: move(os.path.join(ROOT, o), os.path.join(legacy, os.path.basename(o))))
+    print(f"cog migrate: {len(steps)} steps" + ("" if apply else " (dry run; --apply to do them)"))
+    print("".join(f"  {s}\n" for s in steps), end="")
+    return apply and tidy()
+
+def main(argv):
+    global ROOT
+    if "--root" in argv:
+        i = argv.index("--root")
+        ROOT, argv = os.path.abspath(argv[i + 1]), argv[:i] + argv[i + 2:]
+    else:
+        here = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "memory")
+        home = os.environ.get("COG_HOME")
+        ROOT = os.path.join(home, "memory") if home else here if os.path.isdir(here) else os.path.expanduser("~/cog/memory")
+    if not argv or argv[0] not in ("tidy", "when", "migrate"):
+        return print(__doc__)
+    if not os.path.isdir(ROOT):
+        sys.exit(f"cog: no memory folder at {ROOT}")
+    cmd = {"tidy": lambda: tidy("--dry-run" in argv, "--quiet" in argv), "when": lambda: when(argv[1:]),
+           "migrate": lambda: migrate("--apply" in argv)}
+    cmd[argv[0]]()
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
